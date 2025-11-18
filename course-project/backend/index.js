@@ -19,9 +19,17 @@ const port = (() => {
 })();
 
 const express = require("express");
+const cors = require('cors');
 const app = express();
 
 app.use(express.json());
+
+// connect to frontend
+app.use(cors({ origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 // ADD YOUR WORK HERE
 const userRoutes = require('./routes/users'); 

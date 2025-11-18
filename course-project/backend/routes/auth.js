@@ -24,7 +24,7 @@ router.post('/tokens', async (req, res) => {
 
     const { utorid, password } = req.body;
     if (!utorid || password === undefined)  {
-        return res.status(400).json({ error: "invalid payload" });
+        return res.status(400).json({ error: "Missing UTORid or password" });
     }
 
     const user = await prisma.user.findUnique({
@@ -34,7 +34,7 @@ router.post('/tokens', async (req, res) => {
     });
 
     if (!user || user.password !== password) {
-        return res.status(401).json({ error: "invalid login credentials" });
+        return res.status(401).json({ error: "UTORid or password is incorrect" });
     }
 
     const userData = {
