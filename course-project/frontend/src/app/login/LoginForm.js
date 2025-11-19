@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext.jsx';
-import Button from './Button';
+import Button from '../components/Button.js';
 import styles from './LoginForm.module.css';
 import colors from '../constants/colors.js';
 

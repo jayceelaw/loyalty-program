@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Symbol from './Symbol';
 import colors from '../constants/colors';
-import { clearAuth, getUserData } from '../utility/auth';
-import { useFetchAuthenticated } from '../utility/useFetch';
+// import { clearAuth, getUserData } from '../utility/auth';
+// import { useFetchAuthenticated } from '../utility/useFetch';
 import styles from './NavigationBar.module.css';
 
 export default function NavigationBar() {
@@ -23,10 +23,13 @@ export default function NavigationBar() {
   const dropdownRef = useRef(null);
 
   // Fetch tasks data
-  const { data: tasksData } = useFetchAuthenticated('/api/tasks');
+  // const { data: tasksData } = useFetchAuthenticated('/api/tasks');
+  const tasksData = [];
 
   // Fetch tamagotchi data for coins
-  const { data: tamagotchiData, refetch: refetchTamagotchi } = useFetchAuthenticated('/api/tamagotchi');
+  // const { data: tamagotchiData, refetch: refetchTamagotchi } = useFetchAuthenticated('/api/tamagotchi');
+  const tamagotchiData = [];
+  const refetchTamagotchi = () => {};
 
   const navItems = [
     { label: 'My Tamagotchi', path: '/dashboard' },
@@ -43,10 +46,10 @@ export default function NavigationBar() {
   const isMainNavPage = navItems.some(item => normalizePath(item.path) === normalizePath(pathname));
 
   // Load user data on mount
-  useEffect(() => {
-    const user = getUserData();
-    setUserData(user);
-  }, []);
+  // useEffect(() => {
+  //   const user = getUserData();
+  //   setUserData(user);
+  // }, []);
 
   // Calculate tasks due today
   useEffect(() => {

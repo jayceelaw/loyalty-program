@@ -1,0 +1,106 @@
+.container {
+  /* min-height: calc(100vh - 72px); nav height */
+  margin-top: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+}
+
+.card {
+  width: 60%;    
+  height: 75%;
+  margin-top: 20px;
+  padding: 3%;
+  border-radius: 14px;    
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none;    
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+.form {
+  height: 92%;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, auto) auto 1fr auto;
+  /* gap: 40px 18px; */
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.92rem;
+  color: #222;
+}
+
+.input, .select {
+  height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: white;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow .12s, border-color .12s;
+}
+
+.input:focus, .select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+}
+
+/* make full-width items span both columns */
+.label:nth-child(1),
+.label:nth-child(2),
+.label:nth-child(3) {
+  grid-column: 1 / -1;
+  margin-bottom: 4%;
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: auto;
+  justify-self: end;
+  align-self: end; 
+  margin-bottom: 20px;
+}
+
+.error {
+  grid-column: 1 / -1;
+  color: #b00020;
+  background: rgba(176,0,32,0.06);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.success {
+  grid-column: 1 / -1;
+  color: #0a7a28;
+  background: rgba(10,122,40,0.06);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* responsive */
+@media (max-width: 720px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 18px;
+  }
+}
