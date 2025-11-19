@@ -1,0 +1,145 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    background-color: wheat;
+    width: 95%;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.label {
+    font-weight: bold;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    width: 100%;
+
+}
+
+.id {
+    margin-right: 24px;
+    margin-left: 4px;
+}
+
+.center {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 40px;
+}
+
+.typeContent {
+    position: absolute;
+    right: 16px;
+}
+
+.processed {
+    color: green;
+}
+
+.pending {
+    color: yellow;
+}
+
+.type {
+    border-radius: 50px;
+    width: 80px;
+    margin-left: 4px;
+    margin-right: 16px;
+    text-align: center;
+}
+
+.amount {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.positive {
+    color: green;
+}
+
+.negative {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.buttons {
+    position: absolute;
+    display: flex;
+    right: 16px;
+    gap: 8px;
+}
+
+.promotions {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    width: 100% - 84px;
+    margin-top: 4px;
+    margin-left: 100px;
+    margin-right: 16px;
+    gap: 16px;
+}
+
+.promotion {
+    background-color: pink;
+    border-radius: 50px;
+    padding: 4px;
+    width: auto;
+    font-size: 10px;
+    margin-bottom: 2px;
+}
+
+.remark {
+    margin-left: 100px;
+    font-size: 12px;
+    color: gray;
+}
+
+.footer {
+    position: relative;
+    display: flex;
+}
+
+.suspicious {
+    position: absolute;
+    right: 16px;
+    color: red;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.creator {
+    font-size: 10px;
+}
+
+.purchase {
+    background-color: orange;
+    border-radius: 10px;
+}
+
+.transfer {
+    background-color: yellow;
+    border-radius: 10px;
+}
+
+.redemption {
+    background-color: rosybrown;
+    border-radius: 10px;
+}
+
+.event {
+    background-color: green;
+    border-radius: 10px;
+}
+
+.adjustment {
+    background-color: orangered;
+    border-radius: 10px;
+}
