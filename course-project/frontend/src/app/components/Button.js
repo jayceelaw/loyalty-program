@@ -71,6 +71,40 @@ export function SecondaryButton({
   );
 }
 
+export function BackButton({
+  text,
+  symbol,
+  symbolPosition = 'left',
+  backgroundColor = colors.primaryBlue,
+  outlineColor = 'none',
+  textColor = colors.white,
+  onClick,
+  disabled = false,
+  type = 'button',
+  className = '',
+}) {
+  const buttonStyle = {
+    backgroundColor: outlineColor === 'none' ? backgroundColor : 'transparent',
+    border: outlineColor !== 'none' ? `2px solid ${outlineColor}` : 'none',
+    color: textColor,
+    opacity: disabled ? 0.5 : 1,
+  };
+
+  return (
+    <button
+      type={type}
+      className={`${styles.button} ${styles.primary} ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+      style={buttonStyle}
+    >
+      {symbol && symbolPosition === 'left' && symbol}
+      {text && <span className={styles.buttonText}>{text}</span>}
+      {symbol && symbolPosition === 'right' && symbol}
+    </button>
+  );
+}
+
 // Default export for backwards compatibility
 export default function Button({
   children,
@@ -84,6 +118,18 @@ export default function Button({
   if (variant === 'secondary') {
     return (
       <SecondaryButton
+        text={children}
+        onClick={onClick}
+        disabled={disabled}
+        type={type}
+        className={className}
+      />
+    );
+  }
+
+  else if (variant === 'back') {
+    return (
+      <BackButton
         text={children}
         onClick={onClick}
         disabled={disabled}
