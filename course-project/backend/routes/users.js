@@ -39,10 +39,10 @@ function formatTransactions(transactions) {
     // for each transaction type, list of fields to display
     const typeFields = {
         purchase: ["id", "utorid", "type", "remark", "createdBy", "amount", "spent", "promotionIds", "suspicious"],
-        transfer: ["id", "type", "remark", "createdBy", "sender", "recipient", "sent"],
+        transfer: ["id", "utorid", "type", "remark", "createdBy", "sender", "recipient", "amount"],
         redemption: ["id", "utorid", "type", "remark", "createdBy", "amount", "promotionIds", "relatedId", "redeemed"],
         adjustment: ["id", "utorid", "amount", "type", "relatedId", "promotionIds", "suspicious", "remark", "createdBy"],
-        event: ["id", "recipient", "awarded", "type", "eventId", "remark", "createdBy"]
+        event: ["id", "utorid", "recipient", "amount", "type", "eventId", "remark", "createdBy"]
     };
 
     return transactions.map(transaction => {

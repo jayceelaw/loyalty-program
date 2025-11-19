@@ -922,6 +922,7 @@ router.post('/:eventId/transactions', jwtAuth, async (req, res) => {
                             remark: event.name,
                             createdBy: req.user.utorid,
                             awarded: amount,
+                            amount: amount,
                             eventId: event.id // used to display a user's transactions
                         },
                         select: {
