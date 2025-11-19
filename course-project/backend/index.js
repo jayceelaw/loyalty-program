@@ -19,6 +19,7 @@ const port = (() => {
 })();
 
 const express = require("express");
+const path = require('path');
 const cors = require('cors');
 const app = express();
 
@@ -26,10 +27,13 @@ app.use(express.json());
 
 // connect to frontend
 app.use(cors({ origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
+
+// allow frontend to access uploaded images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ADD YOUR WORK HERE
 const userRoutes = require('./routes/users'); 

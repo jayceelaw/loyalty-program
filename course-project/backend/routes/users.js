@@ -8,8 +8,8 @@ const { PrismaClient, TransactionType } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { v4: uuid } = require('uuid');
 
-const multer = require('multer')
-const upload = multer({ dest: 'uploads/' })
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 const jwtAuth = require('../middleware/jwtAuth');
 const { typeCheck, parseQuery } = require('../middleware/verifyInput');
@@ -64,18 +64,18 @@ router.route('/')
 
         const { utorid, name, email } = req.body;
         if (!utorid || !/^[a-zA-Z0-9]{7,8}$/.test(utorid))  {
-            return res.status(400).json({ error: "invalid utorid" });
+            return res.status(400).json({ error: "Invalid UTORid: must only contain letters or numbers, 7-8 characters" });
         } else if (await prisma.user.findUnique({ where: { utorid: utorid } })) {
-            return res.status(409).json({ error: "utorid already exists" });
+            return res.status(409).json({ error: "UTORid already exists" });
         }
         
         if (!name || name.length < 1 || name.length > 50) {
-            return res.status(400).json({ error: "invalid name" });
+            return res.status(400).json({ error: "Name must be between 1-50 characters" });
         }
         
         // Valid UofT email: allow mail.utoronto.ca or utoronto.ca variants
-        if (!email || !/^[A-Za-z0-9._%+-]+@(?:mail\.)?utoronto\.ca$/i.test(email)) {
-           return res.status(400).json({ error: "invalid uoft email" });
+        if (!email || !/^.+@(?:mail\.)?utoronto\.ca$/.test(email)) {
+           return res.status(400).json({ error: "Invalid UofT email" });
         }
 
         // add exising promotions
@@ -167,30 +167,35 @@ router.route('/me')
 
         if (name !== undefined) {
             if (name.length < 1 || name.length > 50) {
-                return res.status(400).json({ error: "invalid name" });
+                return res.status(400).json({ error: "Name must be between 1-50 characters" });
             }
             update_data.name = name;
         }
         
         if (email !== undefined) {
-            if (!/^.+\..+@(?:mail\.)?utoronto\.ca$/.test(email)
-                || await prisma.user.findUnique({ where: { email } })) {
-                return res.status(400).json({ error: "invalid uoft email" });
+            if (!/^.+@(?:mail\.)?utoronto\.ca$/.test(email)) {
+                return res.status(400).json({ error: "Invalid UofT email" });
             }
+
+            const user = await prisma.user.findUnique({ where: { email: email } }) ;
+            if (user.id != req.user.id) {
+                return res.status(400).json({ error: "Email already in use" });
+            }
+
             update_data.email = email;
         }
 
         if (birthday !== undefined) {
             // check format
             if (!/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
-                return res.status(400).json({ error: "invalid birthday (yyyy-mm-dd)" });
+                return res.status(400).json({ error: "Invalid birthday (yyyy-mm-dd)" });
             }
             // check for valid date
             const [y, m, d] = birthday.split("-").map(Number);
             const date = new Date(y, m - 1, d); // month starts at 0 in Date
             // check if it matches its corresponding date conversion (since Date auto formats incorrect dates)
             if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) {
-                return res.status(400).json({ error: "invalid birthday. date does not exist" });
+                return res.status(400).json({ error: "Invalid birthday" });
             }
 
             update_data.birthday = birthday;
@@ -210,10 +215,13 @@ router.route('/me')
     .get(jwtAuth, async (req, res) => {
         const user = await prisma.user.findUnique({ where: { id: req.user.id }, include: { promotions: true} });
         if(!user) {
-            return res.status(404).json({ error: "user not found" }); // should not be possible
+            return res.status(404).json({ error: "User not found" }); // should not be possible
         }
 
-        res.json(getUserInfo(user));
+        const userInfo = getUserInfo(user);
+        userInfo.password = user.password;
+
+        res.json(userInfo);
     });
 
 router.patch('/me/password', jwtAuth, async (req, res) => {
@@ -223,13 +231,14 @@ router.patch('/me/password', jwtAuth, async (req, res) => {
 
     const { old, new: newPassword } = req.body;
 
-    if (!old || old !== req.user.password) {
-        return res.status(403).json({ error: "incorrect password" });
+    if (old !== req.user.password) {
+        return res.status(403).json({ error: "Current password is incorrect" });
     }
     
     if (!newPassword || newPassword.length < 8 || newPassword.length > 20
         || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/.test(newPassword)) {
-        return res.status(400).json({ error: "invalid password" });
+        return res.status(400).json({ error: "New password must have 8-20 characters and \
+            include at least 1 number, 1 uppercase, 1 lowercase, and 1 special character." });
     }
 
     await prisma.user.update({
