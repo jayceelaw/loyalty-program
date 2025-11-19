@@ -170,9 +170,6 @@ export default function EditProfileForm() {
       {success && <div className={styles.success}>{success}</div>}
 
       <div className={styles.formActions}>
-        {/* <Button type="button" onClick={() => { setName(''); setEmail(''); setBirthday(''); setAvatarFile(null); }}>
-          Clear
-        </Button> */}
         <Button type="submit" disabled={loading}>
           {loading ? 'Saving…' : 'Save Changes'}
         </Button>

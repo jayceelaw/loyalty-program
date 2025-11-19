@@ -115,7 +115,7 @@ export default function RegisterForm() {
               Cancel
             </Button> */}
             <Button type="submit" disabled={loading}>
-              {loading ? 'Creating…' : 'Create user'}
+              {loading ? 'Creating…' : 'Create User'}
             </Button>
           </div>
         </form>

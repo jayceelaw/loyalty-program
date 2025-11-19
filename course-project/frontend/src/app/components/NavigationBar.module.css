@@ -7,6 +7,7 @@
   z-index: 1000;
   display: flex;
   justify-content: center;
+  margin-top: 1vh;
 }
 
 .navContainer {
@@ -137,7 +138,7 @@
 .dropdown {
   position: absolute;
   top: calc(100% + var(--spacing-s));
-  right: 0;
+  right: -160px;
   background: var(--color-white);
   border-radius: var(--radius-medium);
   border: 2px solid var(--color-light-gray);

@@ -212,6 +212,10 @@ input {
     border-radius: 10px;
 }
 
+input[type="file"] {
+  border-radius: 0;
+}
+
 .main-container h5 {
     align-self: flex-start;
     text-align: left;
@@ -250,4 +254,28 @@ input {
     overflow-y: auto;
     scrollbar-width: none;
 
+}
+
+/* user/setting pages */
+.container {
+  margin-top: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+}
+
+.card {
+  width: 70%;
+  height: 85%;
+  min-height: fit-content;
+  margin-top: 20px;
+  padding: 3%;
+  padding-left: 2%;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none;
 }

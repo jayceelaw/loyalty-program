@@ -1,18 +1,15 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-import LoginPage from './login/page';
-import RegisterPage from "./user/register/page";
+'use client';
 
-export default function Home() {
-  // return (
-  //   <div className={styles.page}>
-  //     <main className={styles.main}>
-  //       <h1>Welcome to CSC309 App</h1>
-  //       <p>Select a section from the navigation.</p>
-  //     </main>
-  //   </div>
-  // );
-  
-  // return <LoginPage />;
-  return <RegisterPage />;
+import LoginPage from './login/page';
+import UserDashboardPage from './user/page';
+import { useAuth } from '../context/AuthContext.jsx';
+
+export default function Root() {
+  const { user } = useAuth();
+
+  if (user) { // user is logged in
+    return <UserDashboardPage />; // can change to whatever home page
+  } else {
+    return <LoginPage />;
+  }
 }

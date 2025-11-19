@@ -27,7 +27,6 @@ export default function ChangePasswordForm() {
         });
         if (!res.ok) return;
         const data = await res.json();
-        console.log(data);
         if (!mounted) return;
         // usually users dont have passwords when first created 
         const pw = data?.password;

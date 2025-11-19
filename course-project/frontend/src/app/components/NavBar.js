@@ -16,10 +16,14 @@ export default function NavBar() {
   const navRef = useRef(null);
   const dropdownRef = useRef(null);
   const navItems = [
-    { label: 'Login', path: '/login'},
+    // { label: 'Login', path: '/login'},
     { label: 'Events', path: '/event' },
     { label: 'Promotions', path: '/store' },
     { label: 'QR', path: '/user/qr' },
+  ];
+  const specialItems = [
+    { label: 'Register User', path: '/user/register' },
+    { label: 'View Users', path: '/user/view' }
   ];
 
   // Helper to normalize paths for comparison (handle trailing slashes)
@@ -28,7 +32,8 @@ export default function NavBar() {
   const isActive = (path) => normalizePath(pathname) === normalizePath(path);
 
   // Check if current page is in the main nav
-  const isMainNavPage = navItems.some(item => normalizePath(item.path) === normalizePath(pathname));
+  const isMainNavPage = navItems.some(item => normalizePath(item.path) === normalizePath(pathname))
+                        || specialItems.some(item => normalizePath(item.path) === normalizePath(pathname));
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -97,6 +102,19 @@ export default function NavBar() {
 
           {/* Divider */}
           <div className={styles.divider} />
+
+          {/* role-dependent actions */}
+          {specialItems.map((item) => (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={`${styles.navTab} ${
+                isActive(item.path) ? styles.active : ''
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
 
         {/* User Menu - outside the pill */}

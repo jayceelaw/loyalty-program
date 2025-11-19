@@ -19,8 +19,8 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <TransactionProvider>
             <NavigationProvider>
-                <NavBar/>
-                {children}
+              <NavBar/>
+              {children}
             </NavigationProvider>
           </TransactionProvider>
         </AuthProvider>

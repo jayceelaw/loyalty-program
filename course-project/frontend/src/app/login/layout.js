@@ -1,6 +1,7 @@
-import './globals.css'
+import '../globals.css'
 import { Inter } from 'next/font/google'
-import { AuthProvider } from '../context/AuthContext';
+import { AuthProvider } from '../../context/AuthContext';
+import { TransactionProvider } from '@/context/TransactionContext';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -9,15 +10,14 @@ export const metadata = {
   description: 'CSC309 project frontend',
 }
 
-// no navigation bar
 export default function LoginLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider> 
-          <main>
-            {children}
-          </main>
+        <AuthProvider>
+          <TransactionProvider>
+                {children}
+          </TransactionProvider>
         </AuthProvider>
       </body>
     </html>

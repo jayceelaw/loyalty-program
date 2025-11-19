@@ -11,7 +11,7 @@ export const colors = {
   primaryYellowDark: '#c29343',
   primaryOrange: '#d18544',
   primaryOrangeDark: '#cc782f',
-  primaryGreen: '#6DB159',
+  primaryGreen: '#6d9e5fff',
   primaryGreenDark: '#548164',
   primaryBlue: '#153169',
   primaryBlueDark: '#487ca5',
