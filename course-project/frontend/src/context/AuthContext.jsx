@@ -1,32 +1,35 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-const AuthContext = createContext({ user: null, token: null, login: async () => {}, logout: () => {} });
+const AuthContext = createContext({ user: null, token: null, login: async () => {}, logout: () => {}, initializing: true });
 export const useAuth = () => useContext(AuthContext);
-
-function parseJwt(token) {
-  try {
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-    return JSON.parse(json);
-  } catch (e) {
-    return null;
-  }
-}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [initializing, setInitializing] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (t) {
-      setToken(t);
-      const payload = parseJwt(t);
-      if (payload) setUser(payload); // payload contains id + role 
+    setInitializing(true);
+    const token = localStorage.getItem("token");
+    
+    if (!token) { 
+        setUser(null);
+        setInitializing(false);
+    } else {
+        setToken(token);
+
+        fetch('/users/me', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+        })
+        .then((data) => data.json())
+        .then((data) => setUser(data))
+        .finally(() => setInitializing(false));
     }
-  }, []);
+  }, [])
 
   const login = async (utorid, password) => {
     const res = await fetch('/auth/tokens', {
@@ -38,27 +41,32 @@ export function AuthProvider({ children }) {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data?.error || `Error ${res.status}: ${res.statusText}`);
+      throw new Error(data?.error || 'Login failed');
     }
 
-    const receivedToken = data.token;
-    setToken(receivedToken);
-    if (typeof window !== 'undefined') localStorage.setItem('token', receivedToken);
+    setToken(data.token);
+    localStorage.setItem('token', data.token);
 
-    const payload = parseJwt(receivedToken);
-    setUser(payload || { utorid });
+    fetch('/users/me', {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${data.token}` }
+    })
+    .then((data) => data.json())
+    .then(data => setUser(data));
 
-    return data;
+    router.push("/user"); // TODO: change to home page
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
-    if (typeof window !== 'undefined') localStorage.removeItem('token');
+      localStorage.removeItem("token");
+      setToken(null);
+      setUser(null);
+
+      router.push("/");
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, initializing }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
-import NavBar from './components/NavBar'
+import NavBar from './components/CondNavBar'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '../context/AuthContext';

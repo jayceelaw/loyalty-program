@@ -22,7 +22,6 @@ export default function LoginForm() {
     setLoading(true);
     try {
       await login(utorid.trim(), password);
-      router.push("/"); // TODO: change to home page
     } catch (err) {
       setError(err?.message || 'Login failed');
     } finally {

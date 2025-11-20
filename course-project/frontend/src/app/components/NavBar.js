@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import TransactionMenu from "./TransactionMenu";
+import { useAuth } from '../../context/AuthContext.jsx';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './NavigationBar.module.css';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ export default function NavBar() {
   const [userData, setUserData] = useState(null);
   const navRef = useRef(null);
   const dropdownRef = useRef(null);
+  const { logout } = useAuth();
   const navItems = [
     // { label: 'Login', path: '/login'},
     { label: 'Events', path: '/event' },
@@ -152,7 +154,7 @@ export default function NavBar() {
                 onClick={() => {
                 //   clearAuth();
                   setIsUserMenuOpen(false);
-                  router.push('/login');
+                  logout();
                 }}
               >
                 <span className={styles.dropdownIcon}>🚪</span>

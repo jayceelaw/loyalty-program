@@ -1,7 +1,6 @@
 import '../globals.css'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '../../context/AuthContext';
-import { TransactionProvider } from '@/context/TransactionContext';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,9 +14,7 @@ export default function LoginLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <TransactionProvider>
-                {children}
-          </TransactionProvider>
+          {children}
         </AuthProvider>
       </body>
     </html>

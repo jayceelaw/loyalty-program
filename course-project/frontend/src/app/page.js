@@ -1,16 +1,27 @@
 'use client';
 
-import LoginPage from './login/page';
-import UserDashboardPage from './user/page';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext.jsx';
+import styles from './page.module.css';
+import UserDashboardPage from './user/page';
 
 export default function Root() {
-  const { user } = useAuth();
-  console.log(user)
+  const { user, initializing } = useAuth();
+  const router = useRouter();
+  console.log(user, initializing)
 
-  if (user) { // user is logged in
-    return <UserDashboardPage />; // can change to whatever home page
-  } else {
-    return <LoginPage />;
+  if (initializing) { // cover page when loading
+    return <div className={styles.loadingPage}></div>;
   }
+
+  useEffect(() => {
+    if (!initializing && !user) { // user not logged in
+      router.replace('/login');
+    }
+  }, [user, initializing, router]);
+
+  if (!user) return null;
+
+  return <UserDashboardPage />; // TODO: change to home page
 }

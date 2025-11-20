@@ -143,3 +143,17 @@ a.secondary {
 .container {
   padding: 16px;
 }
+
+/* cover root page when loading */
+.loadingPage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  z-index: 99999; 
+}

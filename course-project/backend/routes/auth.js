@@ -95,7 +95,6 @@ router.post('/resets', async (req, res) => {
 });
 
 router.post('/resets/:resetToken', async (req, res) => {
-    console.log(req.body)
     const resetToken = req.params.resetToken;
     if (!resetToken) {
         return res.status(404).json({ error: "Missing reset token" });
