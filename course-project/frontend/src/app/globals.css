@@ -156,12 +156,15 @@ html, body, #root {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background-color: var(--color-primary-blue);
-    width: 80vw;
-    height: 80vh;
+    width: 90%; 
+    padding: 60px 20px;
+    margin: 100px auto 20px auto;
     border-radius: 50px;
+    box-sizing: border-box;
 }
+
 
 .qr {
     border: 20px;

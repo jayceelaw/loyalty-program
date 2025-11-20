@@ -1,0 +1,84 @@
+/* Form container */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+/* Full-width inputs for Promotion Name + Description */
+.fullWidthInput {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Two-column layout */
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+/* Columns themselves */
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Type Toggle */
+.toggleContainer {
+    display: flex;
+    gap: 12px;
+}
+
+.toggleButton {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #f2f2f2;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.toggleButton:hover {
+    background-color: #e6e6e6;
+}
+
+.active {
+    background-color: #3b82f6; /* blue */
+    color: white;
+    border-color: #2563eb;
+}
+
+/* Footer with message and button */
+.footer {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+    justify-content: center; 
+    gap: 12px;
+    width: 100%;
+}
+
+/* Message styling */
+.message {
+    font-size: 14px;
+    min-height: 20px; /* prevents overlap */
+    text-align: center;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: white;
+}
