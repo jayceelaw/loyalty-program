@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import TransactionMenu from "./TransactionMenu";
+import PromotionMenu from "./PromotionMenu";
 import { useAuth } from '../../context/AuthContext.jsx';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './NavigationBar.module.css';
@@ -99,7 +100,7 @@ export default function NavBar() {
               {item.label}
             </Link>
           ))}
-
+          <PromotionMenu/>
           <TransactionMenu/>
 
           {/* Divider */}
