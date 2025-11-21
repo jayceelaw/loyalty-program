@@ -18,13 +18,21 @@ export default function UserView() {
     const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL || ''; // e.g. http://localhost:3001
 
     const fetchUsers = async () => {
-        // build query safely
-        const params = new URLSearchParams();
-        if (roleFilter && roleFilter !== '') params.append('role', roleFilter);
-        if (verifiedFilter != null) params.append('verified', String(verifiedFilter));
-        if (activatedFilter != null) params.append('activated', String(activatedFilter));
-        params.append('page', String(page || 1));
-        params.append('limit', String(limit));
+        // creating filters for backend 
+        let params = "";
+        if (roleFilter && roleFilter !== '') {
+            params += "role=" + roleFilter
+        }
+        if (verifiedFilter) {
+            params += "&verified=" + verifiedFilter
+        }
+         if (activatedFilter) {
+            params += "&activated=" + activatedFilter
+        }
+        console.log(params);
+
+        // params.append('page', String(p));
+        // params.append('limit', String(limit));
 
         const res = await fetch(`/users?${params.toString()}`, {
             method: 'GET',
@@ -33,12 +41,18 @@ export default function UserView() {
                 ...(token ? { Authorization: `Bearer ${token}` } : {})
             }
         });
-        const data = await res.json();
-        if (!res.ok) {
+        const data = await res.json()
+        console.log(data)
+
+        if (!res.ok) { // should not happen
             console.log(data?.message || `Error: ${res.status}`);
             return;
         }
-        setUsers(data.results || []);
+
+        setUsers(data.results);
+
+        // setHasMore(received.length === limit);
+        // setPage(p);
     };
 
     // fetch users everytime filter changes
@@ -120,6 +134,7 @@ export default function UserView() {
                 <div className={styles.resultsCard}>
                     <div className={styles.userList}>
                         {users.map(u => {
+                            // normalize avatar URL: prefer absolute; if relative prefix backend base; fallback to public svg
                             let avatarSrc = '/Friend Symbol.svg';
                             if (u?.avatarUrl) {
                                 if (/^https?:\/\//i.test(u.avatarUrl)) {
@@ -182,7 +197,7 @@ export default function UserView() {
                         <div ref={observerRef} style={{ height: 1 }} />
 
                         {users.length === 0 && <div className={styles.empty}>No users found</div>}
-                        {users.length > 0 && <div className={styles.subtitle} style={{ textAlign: "center" }}>No more users</div>}
+                        {users.length > 0 && <div className={styles.subtitle} style={{ textAlign: "center" }} >No more users</div>}
                     </div>
                 </div>
             </div>
