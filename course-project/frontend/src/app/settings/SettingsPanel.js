@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import EditProfileForm from './EditProfileForm';
 import ChangePasswordForm from './ChangePasswordForm';
-import styles from './Settings.module.css';
+import styles from './settings.module.css';
 import colors from '../constants/colors';
 
 const NAV_ITEMS = [

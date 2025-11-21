@@ -1,0 +1,376 @@
+/* register user */
+
+.container {
+  /* min-height: calc(100vh - 72px); nav height */
+  margin-top: 0;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+}
+
+.card {
+  width: 70%;
+  height: 85%;
+  margin-top: 20px;
+  padding: 3%;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none;
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.form {
+  height: 92%;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, auto) auto 1fr auto;
+  /* gap: 40px 18px; */
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.92rem;
+  color: #222;
+}
+
+.input, .select {
+  height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: white;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow .12s, border-color .12s;
+}
+
+.input:focus, .select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+}
+
+/* make full-width items span both columns */
+.label:nth-child(1),
+.label:nth-child(2),
+.label:nth-child(3) {
+  grid-column: 1 / -1;
+  margin-bottom: 4%;
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: auto;
+  justify-self: end;
+  align-self: end; 
+  margin-bottom: 20px;
+}
+
+.error {
+  grid-column: 1 / -1;
+  color: #b00020;
+  background: rgba(176,0,32,0.06);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.success {
+  grid-column: 1 / -1;
+  color: #0a7a28;
+  background: rgba(10,122,40,0.06);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+
+/* user list view */
+
+.pageContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  width: 65%;
+  margin-top: 1%;
+  background: var(--color-background);
+}
+
+.resultsContainer {
+  margin-top: 1%;
+  /* padding: 28px 24px; */
+  padding-bottom: 100px;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.resultsCard {
+  width: 100%;
+  /* height: 90%; */
+  height: fit-content;
+  padding-bottom: 30px;
+  margin-top: 20px;
+  /* padding: 3%; */
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.filterInput {
+  flex: 1 1 240px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--muted-border);
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.filterSelect {
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--muted-border);
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.userList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.userCard {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 1rem;
+  padding-top: 1.7rem;
+  padding-bottom: 1.2rem;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  position: relative;
+  transition: 120ms ease;
+}
+
+.userCard:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.userId {
+  position: absolute;
+  left: 15px;
+  top: 8px;
+  font-size: 0.8rem;
+  color: var(--muted-text);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--avatar-bg);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.userMain {
+  margin-left: 2%;
+}
+
+.userHeader {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roleBadge {
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  display: inline-block;
+  padding: 0px 7px;
+  text-align: center;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+/* role colours */
+.roleRegular {
+  color: rgb(80, 55, 45);
+  border: 1px solid rgb(80, 55, 45);
+}
+
+.roleCashier {
+  color: rgb(57, 104, 50);
+  border: 1px solid rgb(57, 104, 50);
+}
+
+.roleManager {
+  color: rgb(46, 83, 162);
+  border: 1px solid rgb(46, 83, 162);
+}
+
+.roleSuperuser {
+  color: rgb(147, 126, 5);
+  border: 1px solid rgb(147, 126, 5);
+}
+
+.verifiedBadge {
+  margin-left: 8px;
+  background: rgba(10,122,40,0.08);
+  color: #0a7a28;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  margin-top: 5px;
+}
+
+.userEmail {
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  margin-top: 0.25rem;
+}
+
+.userMeta {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  align-items: center;
+}
+
+.points {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.userActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.showMoreBtn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: white !important;
+  transition: 120ms ease;
+}
+
+.showMoreBtn:hover {
+  scale: 1.0;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted-text);
+}
+
+@media (max-width: 720px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 18px;
+  }
+}
+
+.roleFilterGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.roleFilterBtn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--muted-border);
+  background: var(--card-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.roleFilterActive {
+  background: rgb(237, 237, 237) !important;
+  /* color: #fff !important; */
+  border-color: rgb(97, 97, 97) !important;
+}
+
+.filterDropDown {
+  min-width: 160px;
+}
+
+.filterItem {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 6px;
+  align-items: center;
+}
+
+.filterLabel {
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  margin-top: 1px;
+}
+
+@media (max-width: 880px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+}

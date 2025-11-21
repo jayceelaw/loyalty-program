@@ -110,7 +110,6 @@ router.route('/')
         });
     })
     .get(jwtAuth, async (req, res) => {
-
         if (req.user.role !== 'manager' && req.user.role !== 'superuser') {
             return res.status(403).json({ error: "not permitted" });
         }

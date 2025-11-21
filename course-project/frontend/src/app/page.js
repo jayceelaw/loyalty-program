@@ -9,7 +9,6 @@ import UserDashboardPage from './user/page';
 export default function Root() {
   const { user, initializing } = useAuth();
   const router = useRouter();
-  console.log(user, initializing)
 
   if (initializing) { // cover page when loading
     return <div className={styles.loadingPage}></div>;

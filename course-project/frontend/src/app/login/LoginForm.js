@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Button from '../components/Button';
-import styles from './LoginForm.module.css';
+import styles from './login.module.css';
 import colors from '../constants/colors';
 
 export default function LoginForm() {
