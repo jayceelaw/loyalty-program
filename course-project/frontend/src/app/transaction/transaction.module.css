@@ -1,0 +1,118 @@
+.container {
+  min-height: calc(100vh - 120px);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+
+}
+
+.subContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-primary-blue);
+    margin-top: 48px;
+    padding: 24px;
+    width: 80vw;
+    height: 80vh;
+    border-radius: 50px;
+}
+
+
+
+.qr {
+    border: 20px;
+    border-style: solid;
+    border-color: lightgray;
+    border-radius: 16px;
+    width: 30vw;
+    height: 30vw;
+}
+
+.h1 {
+    text-align: left;
+    margin-bottom: 5vh;
+    width: 90%;
+    color: white;
+    font-size: x-large;
+    font-weight: bold;
+
+}
+
+.h3 {
+    text-align: center;
+    font-size: 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30vw;
+    height: 50vh;
+    gap: 8px;
+    padding-bottom: 8px;
+}
+
+
+.h2 {
+    font-size: 16px;
+    font-weight: bold;
+    align-self: flex-start;
+}
+
+.textarea {
+    resize: none;
+    width: 100%;
+    min-height: 60px;
+    border-radius: 10px;
+}
+
+.input {
+    width: 100%;
+    min-height: 32px;
+    border-radius: 10px;
+}
+
+.main-container h5 {
+    align-self: flex-start;
+    text-align: left;
+}
+
+.submit, .back {
+    margin-top: auto;
+}
+.back {
+    position: absolute;
+    bottom: 5%;
+}
+
+.message {
+    margin-top: auto;
+    text-align: center;
+}
+
+.error {
+    color: #C33131;
+}
+
+.success {
+    color: #39C978;
+}
+
+.infiniteScroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-height: 75%;
+    overflow-y: auto;
+
+}
