@@ -14,15 +14,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: var(--color-primary-blue);
+    /* background-color: var(--color-primary-blue); */
     margin-top: 48px;
     padding: 24px;
     width: 80vw;
     height: 80vh;
     border-radius: 50px;
 }
-
-
 
 .qr {
     border: 20px;
@@ -100,9 +98,12 @@
 }
 
 .error {
-    color: #C33131;
+  color: #b00020;
+  background: rgba(176,0,32,0.06);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
-
 .success {
     color: #39C978;
 }
@@ -115,4 +116,8 @@
     max-height: 75%;
     overflow-y: auto;
 
+}
+
+.hidden {
+    display: none;
 }

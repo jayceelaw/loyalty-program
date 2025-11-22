@@ -1,51 +1,71 @@
 'use client';
-import { transfer } from "@/lib/transactions";
 import { BackButton, PrimaryButton } from "../../components/Button";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { useNavigation } from "@/context/NavigationContext";
-import { useTransaction } from "@/context/TransactionContext";
+import PointsBalance from "@/app/components/PointsBalance";
+import FeedBackMessage from "@/app/components/FeedbackMessage";
 
 export default function Redeem() {
 
     const router = useRouter();
-    const { setTransactionID } = useTransaction();
-    const { navStack, setNavStack } = useNavigation();
 
     const [ amount, setAmount ] = useState("");
     const [ remark, setRemark ] = useState("");
     const [ message, setMessage ] = useState("");
     const [ error, setError ] = useState(false);
-    const [ balance, setBalance ] = useState(15);
+    const [ loading, setLoading ] = useState(false);
 
     async function handleRedeem() {
-        setError("");
+        if (loading) return;
+        setLoading(true);
+        setError(false);
+        setMessage("");
 
-        try {
-            // await transfer(recipientID, {amount: Number(amount), type: 'transfer', remark: remark});
-            const transactionID = 3; // TODO: replace with actual transaction ID
-
-            setTransactionID(transactionID);
-            setNavStack([...navStack, '/transaction/redeem']);
+        fetch(`/users/me/transactions`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                        'Content-Type': 'application/json'},
+            method: "POST",
+            body: JSON.stringify({ 
+                type: "redemption",
+                amount: Number(amount),
+                remark: remark })
+        })
+        .then(response => {
+            return response.json().then(result => {
+                if (!response.ok) {
+                    throw new Error(result.error);
+                }
+                else {
+                    setMessage(`ID${result.id}: Redemption successfully processed!`);
+                    return result;
+                }
+            });
+        })
+        .then(data => {
+            localStorage.setItem("transactionID", data.id);
             router.push('/transaction/redeemQr'); 
-        }
-        catch (error) {
+        })
+        .catch(err => {
+            console.log(err);
+            setMessage(err.toString());
             setError(true);
-            setMessage(error);
-        }
+        })
+        .finally( () => {
+            setLoading(false);
+        });
     }
 
     return (
         <div className="main-container">
             <h1>Redeem Points</h1>
-            <h2>{`Current Balance: ${balance} pts`}</h2>
+            <PointsBalance/>
             <div className="form">
                 <h5>Amount</h5>
                 <input type="text" value={amount} onChange={e=>setAmount(e.target.value)}></input>
                 <h5>Remark</h5>
                 <textarea value={remark} onChange={e=>setRemark(e.target.value)}></textarea>
-                <p className={`message ${error ? "error" : "success"}`} value= {message}></p>
-                <PrimaryButton className="submit" text="Redeem" onClick={handleRedeem}/>
+                <FeedBackMessage error={error} message={message}/>
+                <PrimaryButton className="submit" text={loading ? "Redeeming..." : "Redeem"} onClick={() => {if (!loading) handleRedeem()}}/>
             </div>
         </div>
     );

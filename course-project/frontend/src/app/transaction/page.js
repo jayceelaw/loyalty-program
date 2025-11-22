@@ -1,27 +1,36 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import TransactionCard from '../components/TransactionCard';
 import TransactionFilter from '../components/TransactionFilter';
 import styles from '@/app/transaction/transaction.module.css';
+import { useAuth } from '@/context/AuthContext';
 
 
 export default function TransactionsListPage() {
 
   const PAGELIMIT = 5;
+  const { user } = useAuth();
   const [ transactions, setTransactions ] = useState([]);
   const [ filter, setFilter ] = useState({});
   const [ showAll, setShowAll ] = useState(false);
   const [ page, setPage ] = useState(1);
   const [ end, setEnd ] = useState(false);
   const [ loading, setLoading ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState('');
+  const [ error, setError ] = useState(false);
+  const scrollRef = useRef();
   const backendURL = 'http://localhost:4000';
 
-  // create a context for filters, provide it transactionFilter to set filters
+  useEffect(() => {
+    if (user) {
+      setShowAll(user.role === 'manager' || user.role === 'superuser');
+    }
+  }, [user]);
 
   const loadRegular = async () => {
     const url = new URL(backendURL + '/users/me/transactions');
 
-    const allowedKeys = ['type', 'relatedId', 'promotionId', 'amount', 'operator', 'pagination', 'limit'];
+    const allowedKeys = ['type', 'id', 'relatedId', 'promotionId', 'amount', 'operator', 'page', 'limit'];
     const relevantFilters = Object.fromEntries(Object.entries(filter).filter(([k, v]) => {
       return allowedKeys.includes(k) && v !== '';
     }));
@@ -31,14 +40,27 @@ export default function TransactionsListPage() {
     fetch(url, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
     })
-    .then(res => {return res.json()})
-    .then(data => { loadData(data)});
+    .then(response => {
+      return response.json().then(result => {
+        if (!response.ok) {
+          throw new Error(result.error);
+        }
+        else {
+          return result;
+        }
+    });
+    })
+    .then(data => { loadData(data)})
+    .catch(err => {
+      setErrorMessage(err.toString());
+      setError(true);
+    });
   }
 
   const loadPrivileged = async () => {
     const url = new URL(backendURL + '/transactions');
   
-    const allowedKeys = ['utorid', 'createdBy', 'suspicious',
+    const allowedKeys = ['utorid', 'id', 'createdBy', 'suspicious',
             'promotionId', 'type', 'relatedId', 'amount', 'operator', 'page', 'limit'];
     const relevantFilters = Object.fromEntries(Object.entries(filter).filter(([k, v]) => {
       return allowedKeys.includes(k) && v !== '';
@@ -49,8 +71,21 @@ export default function TransactionsListPage() {
     fetch(url, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
     })
-    .then(res => {return res.json()})
-    .then(data => { loadData(data)});
+    .then(response => {
+      return response.json().then(result => {
+        if (!response.ok) {
+          throw new Error(result.error);
+        }
+        else {
+          return result;
+        }
+    });
+    })
+    .then(data => { loadData(data)})
+    .catch(err => {
+      setErrorMessage(err.toString());
+      setError(true);
+    });
   }
 
   const loadData = (data) => {
@@ -58,7 +93,6 @@ export default function TransactionsListPage() {
       console.log('no data');
       return;
     }
-    console.log(page);
     setLoading(true);
     const start = page === 1;
     if (start) {
@@ -77,7 +111,7 @@ export default function TransactionsListPage() {
   }
 
   const load = (specificPage) => {
-    filter.pagination = specificPage === 0 ? 1 : page;
+    filter.page = specificPage === 1 ? 1 : page;
     filter.limit = PAGELIMIT;
 
     let data;
@@ -97,11 +131,17 @@ export default function TransactionsListPage() {
     setPage(0);
     load(1);
     setEnd(false);
+    setError(false);
+    setErrorMessage('');
 
-  }, [filter]);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+
+  }, [filter, showAll]);
 
   const handleScroll = (e) => {
-    const bottomReached = e.target.scrollHeight - e.target.scrollTop > e.target.clientHeight;
+    const bottomReached = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
     if (bottomReached && !loading && !end) { 
       load();
     }
@@ -110,10 +150,11 @@ export default function TransactionsListPage() {
   return (
     <div className='main-container'>
       <h1>My Transactions</h1>
-        <TransactionFilter setFilter={setFilter} setShowAll={setShowAll}/>
-        <div onScroll={handleScroll} className={styles.infiniteScroll}>
+        <p className={'error ' + (error ? '' : styles.hidden)}>{errorMessage}</p>
+        <TransactionFilter setFilter={setFilter} showAll={showAll}/>
+        <div ref={scrollRef} onScroll={handleScroll} className={styles.infiniteScroll}>
           {transactions.map((t, index) => {
-            return <TransactionCard key={index} props={t}/>
+            return <TransactionCard key={index} {...t} showAll={showAll}/>
           })}
           <p>No more transactions.</p>
         </div>

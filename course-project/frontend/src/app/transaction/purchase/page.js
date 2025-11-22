@@ -2,6 +2,7 @@
 import { transfer } from "@/lib/transactions";
 import { PrimaryButton } from "@/app/components/Button";
 import { useState } from "react";
+import FeedBackMessage from "@/app/components/FeedbackMessage";
 export default function Purchase() {
 
     const [ utorid, setUtorid ] = useState("");
@@ -10,19 +11,57 @@ export default function Purchase() {
     const [ remark, setRemark ] = useState("");
     const [ message, setMessage ] = useState("");
     const [ error, setError ] = useState(false);
+    const [ loading, setLoading ] = useState(false);
 
-    async function handleCreate() {
-        setError("");
+    async function handlePurchase() {
+        if (loading) return;
+        setLoading(true);
+        setError(false);
+        setMessage("");
 
-        try {
-            // TODO: call backend
-            setError(false);
-            setMessage("Purchase successfully created!");
+         // clean promotion input
+        const promotionArray = promotions.split(",");
+        let promotionIdArray = promotionArray.map(s => parseInt(s.trim(), 10));
+        if (promotionIdArray.some(v => Number.isNaN(v))) {
+            promotionIdArray = '';
         }
-        catch (error) {
+
+        const options = {
+            type: "purchase",
+            utorid: utorid,
+            spent: Number(spent),
+            promotionIds: promotionIdArray,
+            remark: remark
+        }
+        const relevantOptions = Object.fromEntries(Object.entries(options).filter(([k, v]) => {
+            return v !== '';
+        }));       
+
+        fetch(`/transactions`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                        'Content-Type': 'application/json'},
+            method: "POST",
+            body: JSON.stringify(relevantOptions)
+        })
+        .then(response => {
+            return response.json().then(result => {
+                if (!response.ok) {
+                    throw new Error(result.error);
+                }
+                else {
+                    setMessage(`ID${result.id}: Purchase successfully created!`);
+                    console.log(result);
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            setMessage(err.toString());
             setError(true);
-            setMessage(error);
-        }
+        })
+        .finally (() => {
+            setLoading(false);
+        })
     }
 
     return (
@@ -37,8 +76,9 @@ export default function Purchase() {
                 <input type="text" value={promotions} onChange={e=>setPromotions(e.target.value)}></input>
                 <h5>Remark</h5>
                 <textarea value={remark} onChange={e=>setRemark(e.target.value)}></textarea>
-                <p className={`message ${error ? "error" : "success"}`}>{message}</p>
-                <PrimaryButton className="submit" text="Create" onClick={handleCreate}/>
+                <FeedBackMessage error={error} message={message}/>
+                <PrimaryButton className="submit" text={loading ? "Creating..." : "Create"} 
+                    onClick={() => {if (!loading) handlePurchase()}}/>
             </div>
         </div>
     );

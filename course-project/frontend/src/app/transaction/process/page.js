@@ -1,25 +1,55 @@
 'use client';
-import { transfer } from "@/lib/transactions";
 import { PrimaryButton } from "@/app/components/Button";
+import FeedBackMessage from "@/app/components/FeedbackMessage";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 export default function Process() {
 
+    const { user, loadUser } = useAuth();
     const [ transactionID, setTransactionID ] = useState("");
     const [ message, setMessage ] = useState("");
     const [ error, setError ] = useState(false);
+    const [ loading, setLoading ] = useState(false);
 
     async function handleProcess() {
-        setError("");
+        if (loading) return;
+        setLoading(true);
+        setError(false);
+        setMessage("");
 
-        try {
-            // TODO: call backend
-            setError(false);
-            setMessage("Redemption successfully processed!");
-        }
-        catch (error) {
+        if (transactionID === "") {
             setError(true);
-            setMessage(error);
+            setMessage('Error: Enter a transaction ID.');
+            setLoading(false);
+            return;
         }
+
+        fetch(`/transactions/${transactionID}/processed`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                        'Content-Type': 'application/json'},
+            method: "PATCH",
+            body: JSON.stringify({ processed: true })
+        })
+        .then(response => {
+            return response.json().then(result => {
+                if (!response.ok) {
+                throw new Error(result.error);
+                }
+                else {
+                setMessage(`ID${result.id}: Redemption successfully processed!`);
+                if (result.utorid === user.utorid) {
+                    loadUser();
+                }
+                }
+            });
+        })
+        .catch(err => {
+            setMessage(err.toString());
+            setError(true);
+        })
+        .finally(() => {
+            setLoading(false);
+        })
     }
 
     return (
@@ -28,8 +58,8 @@ export default function Process() {
             <div className="form">
                 <h5>Transaction ID</h5>
                 <input type="text" value={transactionID} onChange={e=>setTransactionID(e.target.value)}></input>
-                <p className={`message ${error ? "error" : "success"}`}>{message}</p>
-                <PrimaryButton className="submit" text="Process" onClick={handleProcess}/>
+                <FeedBackMessage error={error} message={message}/>
+                <PrimaryButton className="submit" text={loading ? "Processing..." : "Process"} onClick={() => {if (!loading) handleProcess()}}/>
             </div>
         </div>
     );
