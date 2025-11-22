@@ -14,6 +14,7 @@ export default function UserView() {
     const [activatedFilter, setActivatedFilter] = useState(null);
     const { token } = useAuth();
     let loading = false;
+    let filter = false;
     const limit = 5;
     const roles = ['regular', 'cashier', 'manager', 'superuser'];
     const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL; // idk why this is needed here
@@ -25,6 +26,12 @@ export default function UserView() {
             loading = true;
         }
 
+        let newUsers = users;
+        if (filter) {
+            filter = false;
+            newUsers = [];
+        }
+
         // creating filters for backend 
         let params = "";
         if (roleFilter && roleFilter !== '') params += "role=" + roleFilter;
@@ -32,6 +39,7 @@ export default function UserView() {
         if (activatedFilter) params += (params ? '&' : '') + "activated=" + activatedFilter;
         params += (params ? '&' : '') + "page=" + p;
         params += "&limit=" + limit;
+        console.log(params)
 
         const res = await fetch(`/users?${params}`, {
             method: 'GET',
@@ -48,7 +56,7 @@ export default function UserView() {
             return;
         }
 
-        setUsers(prev => [...prev, ...data.results])
+        setUsers([...newUsers, ...data.results])
         setReachedEnd(users.length >= data.count);
         setPage(p + 1);
         loading = false;
@@ -59,9 +67,8 @@ export default function UserView() {
         setUsers([]);
         setPage(1);
         setReachedEnd(false);
-        if (users.length === 0 && token) {
-            fetchUsers(1);
-        }
+        filter = true;
+        fetchUsers(1);
     }, [token, roleFilter, verifiedFilter, activatedFilter]);
 
     // for infinite scroll
@@ -69,12 +76,15 @@ export default function UserView() {
         const target = e.target;
         const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
         if (atBottom && !reachedEnd && !loading) {
+            filter = false;
             fetchUsers(page);
         }
     };
 
     const toggleRole = (r) => {
+        console.log(r, roleFilter)
         setRoleFilter(prev => (prev === r ? null : r));
+        console.log(roleFilter)
     };
 
     return (
@@ -86,13 +96,12 @@ export default function UserView() {
 
                 {/* roles filter */}
                 <div className={styles.roleFilterGroup} role="tablist" aria-label="Role filters">
-                    {roles.map(r => (
+                    {roles.map((r) => (
                         <Button
                             key={r}
                             variant="secondary"
                             className={`${styles.roleFilterBtn} ${roleFilter === r ? styles.roleFilterActive : ''}`}
-                            onClick={() => toggleRole(r)}
-                        >
+                            onClick={() => toggleRole(r)}>
                             {r}
                         </Button>
                     ))}
