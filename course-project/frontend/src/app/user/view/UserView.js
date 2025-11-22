@@ -8,64 +8,70 @@ import PrimaryActionDropDownButton from '../../components/PrimaryActionDropDownB
 export default function UserView() {
     const [users, setUsers] = useState([]);
     const [page, setPage] = useState(1);
-    const limit = 20;
-    const [hasMore, setHasMore] = useState(true);
+    const [reachedEnd, setReachedEnd] = useState(false);
     const [roleFilter, setRoleFilter] = useState(null); 
     const [verifiedFilter, setVerifiedFilter] = useState(null);
     const [activatedFilter, setActivatedFilter] = useState(null);
-    const observerRef = useRef(null);
     const { token } = useAuth();
-    const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL || ''; // e.g. http://localhost:3001
+    let loading = false;
+    const limit = 5;
+    const roles = ['regular', 'cashier', 'manager', 'superuser'];
+    const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL; // idk why this is needed here
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (p = 1) => {
+        if (loading) { // prevent fetching twice
+            return;
+        } else {
+            loading = true;
+        }
+
         // creating filters for backend 
         let params = "";
-        if (roleFilter && roleFilter !== '') {
-            params += "role=" + roleFilter
-        }
-        if (verifiedFilter) {
-            params += "&verified=" + verifiedFilter
-        }
-         if (activatedFilter) {
-            params += "&activated=" + activatedFilter
-        }
-        console.log(params);
+        if (roleFilter && roleFilter !== '') params += "role=" + roleFilter;
+        if (verifiedFilter) params += (params ? '&' : '') + "verified=" + verifiedFilter;
+        if (activatedFilter) params += (params ? '&' : '') + "activated=" + activatedFilter;
+        params += (params ? '&' : '') + "page=" + p;
+        params += "&limit=" + limit;
 
-        // params.append('page', String(p));
-        // params.append('limit', String(limit));
-
-        const res = await fetch(`/users?${params.toString()}`, {
+        const res = await fetch(`/users?${params}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 ...(token ? { Authorization: `Bearer ${token}` } : {})
             }
         });
-        const data = await res.json()
-        console.log(data)
+        const data = await res.json();
 
         if (!res.ok) { // should not happen
             console.log(data?.message || `Error: ${res.status}`);
+            loading = false;
             return;
         }
 
-        setUsers(data.results);
-
-        // setHasMore(received.length === limit);
-        // setPage(p);
+        setUsers(prev => [...prev, ...data.results])
+        setReachedEnd(users.length >= data.count);
+        setPage(p + 1);
+        loading = false;
     };
 
     // fetch users everytime filter changes
     useEffect(() => {
-        fetchUsers();
-        // setUsers([]);
-        // setPage(1);
-        // setHasMore(true);
-        
+        setUsers([]);
+        setPage(1);
+        setReachedEnd(false);
+        if (users.length === 0 && token) {
+            fetchUsers(1);
+        }
     }, [token, roleFilter, verifiedFilter, activatedFilter]);
 
-
-    const roles = ['regular', 'cashier', 'manager', 'superuser'];
+    // for infinite scroll
+    const handleScroll = (e) => {
+        const target = e.target;
+        const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
+        if (atBottom && !reachedEnd && !loading) {
+            fetchUsers(page);
+        }
+    };
 
     const toggleRole = (r) => {
         setRoleFilter(prev => (prev === r ? null : r));
@@ -132,9 +138,8 @@ export default function UserView() {
             </div>
             <div className={styles.resultsContainer}>
                 <div className={styles.resultsCard}>
-                    <div className={styles.userList}>
+                    <div className={styles.userList} onScroll={handleScroll}>
                         {users.map(u => {
-                            // normalize avatar URL: prefer absolute; if relative prefix backend base; fallback to public svg
                             let avatarSrc = '/Friend Symbol.svg';
                             if (u?.avatarUrl) {
                                 if (/^https?:\/\//i.test(u.avatarUrl)) {
@@ -194,10 +199,8 @@ export default function UserView() {
                             );
                         })}
 
-                        <div ref={observerRef} style={{ height: 1 }} />
-
                         {users.length === 0 && <div className={styles.empty}>No users found</div>}
-                        {users.length > 0 && <div className={styles.subtitle} style={{ textAlign: "center" }} >No more users</div>}
+                        {reachedEnd && users.length > 0 && <div className={styles.subtitle} style={{ textAlign: "center" }} >No more users</div>}
                     </div>
                 </div>
             </div>
