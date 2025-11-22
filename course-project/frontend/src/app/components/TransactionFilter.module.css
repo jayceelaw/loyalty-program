@@ -7,10 +7,11 @@
     width: 95%;
     scrollbar-width: none;
     padding-bottom: 4px;
+    margin-top: 8px;
 }
 
 .label {
-    color: white;
+    /* color: white; */
 }
 
 .id {

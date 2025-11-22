@@ -2,7 +2,7 @@
 import TagSelect from './TagSelect';
 import styles from './TransactionFilter.module.css';
 import colors from '../constants/colors';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { PrimaryButton } from './Button';
 
 export default function TransactionFilter({setFilter, showAll}) {
@@ -10,6 +10,7 @@ export default function TransactionFilter({setFilter, showAll}) {
     const clearance = showAll ? '' : styles.hidden;
 
     const [ type, setType ] = useState('');
+    const [ id, setId ] = useState('');
     const [ amount, setAmount ] =useState('');
     const [ operator, setOperator ] = useState('gte');
     const [ promotionID, setPromotionID] = useState('');
@@ -19,6 +20,11 @@ export default function TransactionFilter({setFilter, showAll}) {
     const [ suspicious, setSuspicious ] = useState('');
     
     const typeOptions = [
+        {
+          text: 'All types',
+          backgroundColour: colors.primaryBrown,
+          action: () => setType(''),
+        },
         {
           text: 'Purchase',
           backgroundColour: colors.primaryOrange,
@@ -80,22 +86,31 @@ export default function TransactionFilter({setFilter, showAll}) {
     const applyFilter = () => {
       setFilter({
         type: type,
+        id: id,
         amount: amount, 
         operator: operator, 
         promotionId: promotionID,
         relatedId: relatedID,
-        name: owner, 
+        utorid: owner, 
         createdBy: creator, 
         suspicious: suspicious
       });
     };
+
+    const clearFilters = () => {
+      setAmount('');
+      setPromotionID('');
+      setRelatedID('');
+      setOwner('');
+      setCreator('');
+    }
 
     return (
         <div className={styles.container}>
             <TagSelect 
                 type="rounded"
                 backgroundColour={colors.primaryBrown}
-                defaultText={'Type'}
+                defaultText={'All types'}
                 options={typeOptions}
               />
               <TagSelect 
@@ -112,13 +127,16 @@ export default function TransactionFilter({setFilter, showAll}) {
                 options={suspiciousOptions}
               />
               </div>
+            <label className={styles.label}>ID: </label>
+            <input className={styles.id} type='text' value={id} 
+                onChange={e=>(setId(e.target.value))}></input>
             <label className={styles.label}>Amount: </label>
             <input className={styles.amount} type='text' value={amount}
                 onChange={e=>(setAmount(e.target.value))}></input>
-            <label className={styles.label}>Promotion ID: </label>
+            <label className={styles.label}>PromotionID: </label>
             <input className={styles.id} type='text'
                 onChange={e=>(setPromotionID(e.target.value))}></input>
-            <label className={styles.label}>Related ID: </label>
+            <label className={styles.label}>RelatedID: </label>
             <input className={styles.id} type='text' value={relatedID}
                 onChange={e=>(setRelatedID(e.target.value))}></input>
 
@@ -130,6 +148,7 @@ export default function TransactionFilter({setFilter, showAll}) {
             <input className={styles.name + ' ' + clearance} type='text' value={creator}
                 onChange={e=>(setCreator(e.target.value))}></input>
             <PrimaryButton text="Filter" onClick={applyFilter}/>
+            <PrimaryButton text="Clear" onClick={clearFilters} />
         </div>
     );
 }

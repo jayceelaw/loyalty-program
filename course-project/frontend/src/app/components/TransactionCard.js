@@ -3,11 +3,9 @@
 import { useRouter } from "next/navigation";
 import { BackButton, PrimaryButton, SecondaryButton } from "./Button";
 import styles from './TransactionCard.module.css'
-import { useTransaction } from "@/context/TransactionContext";
-import { useNavigation } from "@/context/NavigationContext";
 
-    export default function TransactionCard({props}) {
-      const { id,
+    export default function TransactionCard({
+        id,
         utorid,
         type,
         amount,
@@ -16,20 +14,19 @@ import { useNavigation } from "@/context/NavigationContext";
         // type specific fields
         promotionIds,
         spent,
-        redeemed,
+        processed,
         relatedId, // redemption or adjustment
         eventId,
         sender,
         recipient,
         suspicious,
-        hideAdjust // determine whether adjust button is shown
-      } = props; 
+        hideAdjust,
+        showAll
 
-      const { setTransactionID } = useTransaction();
-      const { navStack, setNavStack } = useNavigation();
+      }) {
+
       const router = useRouter();
       const promotions = promotionIds ? ['sample promotion', 'another promotion'] : [];
-      const showAll = true; // TODO: replace with user's role and setting
 
       // returns the section to display based on related data to each type
       function getHeader() {
@@ -47,7 +44,7 @@ import { useNavigation } from "@/context/NavigationContext";
             );
           case 'redemption':
             return (
-                <p className={redeemed ? styles.processed : styles.pending }>{redeemed ? 'Processed' : 'Pending'}</p>
+                <p className={processed ? styles.processed : styles.pending }>{processed ? 'Processed' : 'Pending'}</p>
             );
           case 'adjustment':
              return (
@@ -58,7 +55,7 @@ import { useNavigation } from "@/context/NavigationContext";
                 <p><span className={styles.label}>Event ID: </span>{eventId}</p>
             );
           default:
-            console.error(`cannot create transaction card for invalid type ${type}`);
+            return;
         }
 
       }
@@ -76,7 +73,7 @@ import { useNavigation } from "@/context/NavigationContext";
           case 'event':
             return styles.event;
           default:
-            console.error(`cannot create transaction card for invalid type ${type}`);
+            return '';
         }
     }
 
@@ -100,13 +97,12 @@ import { useNavigation } from "@/context/NavigationContext";
           <div className={styles.buttons}>  {/* TODO: pass transaction id to adjust in context */}
              <div className={type === 'redemption' ? styles.qr : styles.hidden}>
               <PrimaryButton  text="Scan QR" onClick={()=> {
-                setTransactionID(id);
-                setNavStack([...navStack, '/transaction'])
+                localStorage.setItem("transactionID", id);
                 router.push('transaction/redeemQr');
                 }}/></div>
-             <BackButton className={showAll && !hideAdjust ? '' : styles.hidden} text="Adjust"
+             <BackButton className={(showAll && !hideAdjust) ? '' : styles.hidden} text="Adjust"
               onClick={() => {
-                setTransactionID(id);
+                localStorage.setItem("transactionID", id);
                 router.push('transaction/adjust');
                 }}/> 
           </div>

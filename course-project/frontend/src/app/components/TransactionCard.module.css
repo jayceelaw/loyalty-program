@@ -1,10 +1,18 @@
 .container {
     display: flex;
     flex-direction: column;
-    background-color: wheat;
     width: 95%;
     border-radius: 5px;
     margin: 5px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border: 1px solid #e6e6e6;
+
+}
+
+.container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .label {
@@ -15,6 +23,7 @@
     position: relative;
     display: flex;
     width: 100%;
+    background: #fff;
 
 }
 
@@ -41,7 +50,7 @@
 }
 
 .pending {
-    color: yellow;
+    color: #E0A800;
 }
 
 .type {
@@ -55,6 +64,7 @@
 .amount {
     font-size: 24px;
     font-weight: bold;
+    text-align: right;
 }
 
 .positive {
@@ -88,7 +98,7 @@
 }
 
 .promotion {
-    background-color: pink;
+    background-color: var(--color-primary-pink);
     border-radius: 50px;
     padding: 4px;
     width: auto;
@@ -120,26 +130,26 @@
 }
 
 .purchase {
-    background-color: orange;
+    background-color: var(--color-primary-orange);
     border-radius: 10px;
 }
 
 .transfer {
-    background-color: yellow;
+    background-color: var(--color-primary-yellow);
     border-radius: 10px;
 }
 
 .redemption {
-    background-color: rosybrown;
+    background-color: var(--color-primary-purple);
     border-radius: 10px;
 }
 
 .event {
-    background-color: green;
+    background-color: var(--color-primary-green);
     border-radius: 10px;
 }
 
 .adjustment {
-    background-color: orangered;
+    background-color: var(--color-primary-orange);
     border-radius: 10px;
 }
