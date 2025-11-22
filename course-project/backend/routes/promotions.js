@@ -10,8 +10,6 @@ const prisma = new PrismaClient();
 const jwtAuth = require('../middleware/jwtAuth');
 const { typeCheck, parseQuery } = require('../middleware/verifyInput');
 
-console.log('promotions route loaded');
-
 
 // helpers
 function isoToDate(s) {

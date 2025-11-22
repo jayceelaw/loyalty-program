@@ -1,3 +1,38 @@
+.pageContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  width: 65%;
+  margin-top: 1%;
+  background: var(--color-background);
+}
+
+.resultsContainer {
+  margin-top: 1%;
+  /* padding: 28px 24px; */
+  /* padding-bottom: 100px; */
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.resultsCard {
+  width: 100%;
+  height: fit-content;
+  padding-bottom: 15px;
+  margin-top: 20px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none;
+}
+
+
 /* Form container */
 .form {
     display: flex;
@@ -37,24 +72,25 @@
     gap: 12px;
 }
 
-.toggleButton {
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background-color: #f2f2f2;
-    cursor: pointer;
-    transition: 0.2s;
-    font-size: 14px;
-}
-
 .toggleButton:hover {
     background-color: #e6e6e6;
 }
 
+.toggleButton {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--muted-border);
+  background: var(--card-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
 .active {
-    background-color: #3b82f6; /* blue */
-    color: white;
-    border-color: #2563eb;
+  background: rgb(237, 237, 237) !important;
+  /* color: #fff !important; */
+  border-color: #000 !important;
 }
 
 /* Footer with message and button */
@@ -82,3 +118,4 @@
 .success {
     color: white;
 }
+

@@ -3,7 +3,7 @@ import { PrimaryButton } from "@/app/components/Button";
 import { useState } from "react";
 import styles from "../page.module.css";
 
-export default function CreatePromotion() {
+export default function UpdatePromotion() {
 
     const [promotionName, setPromotionName] = useState("");
     const [description, setDescription] = useState("");
@@ -21,18 +21,28 @@ export default function CreatePromotion() {
         setMessage("");
         try {
             setError(false);
-            setMessage("Create Promotion Successful!");
+            setMessage("Update Promotion Successful!");
         } catch (err) {
             setError(true);
-            setMessage("Failed to create promotion.");
+            setMessage("Failed to update promotion.");
         }
     }
 
     return (
         <div className="main-container">
-            <h1>Create Promotion</h1>
+            <h1>Update Promotion</h1>
 
             <div className={styles.form}>
+
+                {/* Promotion id */}
+                <div className={styles.fullWidthInput}>
+                    <h5>Promotion ID</h5>
+                    <input 
+                        type="text"
+                        value={promotionName}
+                        onChange={(e) => setPromotionName(e.target.value)}
+                    />
+                </div>
 
                 {/* Promotion name */}
                 <div className={styles.fullWidthInput}>

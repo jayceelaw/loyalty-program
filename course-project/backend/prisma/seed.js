@@ -137,14 +137,80 @@ async function main() {
 	  	create: u,
 	});
   }
-      // for each transaction type, list of fields to display
-    // const typeFields = {
-    //     purchase: ["id", "utorid", "type", "remark", "createdBy", "amount", "spent", "promotionIds", "suspicious"],
-    //     transfer: ["id", "utorid", "type", "remark", "createdBy", "sender", "recipient", "amount"],
-    //     redemption: ["id", "utorid", "type", "remark", "createdBy", "amount", "promotionIds", "relatedId", "redeemed"],
-    //     adjustment: ["id", "utorid", "amount", "type", "relatedId", "promotionIds", "suspicious", "remark", "createdBy"],
-    //     event: ["id", "utorid", "recipient", "amount", "type", "eventId", "remark", "createdBy"]
-    // };
+
+  // PROMOTIONS (all start times in the future; endTime after startTime)
+  const h = (hrs) => new Date(Date.now() + hrs * 60 * 60 * 1000);
+
+  const promotions = [
+    {
+      id: 1,
+      name: 'Start of Summer Celebration',
+      description: 'A simple promotion',
+      type: 'automatic',
+      startTime: h(2),
+      endTime:   h(10),
+      minSpending: 50,
+      rate: 0.01,
+      points: 0
+    },
+    {
+      id: 2,
+      name: 'Midweek Booster',
+      description: 'Automatic light booster for midweek purchases',
+      type: 'automatic',
+      startTime: h(6),
+      endTime:   h(30),
+      minSpending: 20,
+      rate: 0.5,
+      points: 10
+    },
+    {
+      id: 3,
+      name: 'One-Time Welcome Drop',
+      description: 'Single-use welcome bonus',
+      type: 'onetime',
+      startTime: h(1),
+      endTime:   h(24),
+      points: 100
+    },
+    {
+      id: 4,
+      name: 'Weekend Surge',
+      description: 'Higher automatic rate for weekend spending',
+      type: 'automatic',
+      startTime: h(12),
+      endTime:   h(60),
+      minSpending: 10,
+      rate: 2.0,
+      points: 25
+    },
+    {
+      id: 5,
+      name: 'Exam Relief One-Time',
+      description: 'One-time relief reward during exam period',
+      type: 'onetime',
+      startTime: h(4),
+      endTime:   h(48),
+      points: 75
+    }
+  ];
+
+  for (const p of promotions) {
+    await prisma.promotion.upsert({
+      where: { id: p.id },
+      update: {
+        name: p.name,
+        description: p.description,
+        type: p.type,
+        startTime: p.startTime,
+        endTime: p.endTime,
+        minSpending: p.minSpending,
+        rate: p.rate,
+        points: p.points
+      },
+      create: p
+    });
+  }
 
   const transactions = [
 	// 6 purchases

@@ -21,7 +21,7 @@ export default function NavBar() {
   const navItems = [
     // { label: 'Login', path: '/login'},
     { label: 'Events', path: '/event' },
-    { label: 'Promotion', path: '/promotion' },
+    // { label: 'Promotion', path: '/promotion' },
     { label: 'QR', path: '/user/qr' },
   ];
   const specialItems = [

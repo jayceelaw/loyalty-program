@@ -1,28 +1,70 @@
 'use client';
-import TransactionCard from '../components/TransactionCard';
-import TransactionFilter from '../components/TransactionFilter';
+import React, { useEffect, useState } from 'react';
+import styles from './page.module.css';
+import { PrimaryButton } from '../components/Button';
 
-export default function TransactionsListPage() {
+export default function PromotionsPage() {
+  const [promotions, setPromotions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
+  const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  // TODO: call api and implment infinite scroll
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      setLoading(true);
+      setErr(null);
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        if (!token) throw new Error('Not logged in');
+        const res = await fetch(`${backend}/promotions`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setPromotions(data.results || []);
+      } catch (e) {
+        setErr(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (backend) fetchPromotions();
+  }, [backend]);
+
   return (
-    <div className='main-container'>
-      <h1>My Promotions</h1>
-        <TransactionFilter/>
-        <div className='infinite-scroll'>
-          <TransactionCard id={1} remark="good deal" amount={20} type='purchase' promotionIds={1} spent={5} />
-          <TransactionCard id={2} type='transfer' remark="pizza" amount={-15} utorid={'abcd123'} sender={'abcd123'} recipient={'plmn0987'} />
-          <TransactionCard id={3} type='redemption' suspicious={true} amount={-20} redeemed={true}/>
-          <TransactionCard id={4} type='adjustment' amount={5} relatedId={2}/>
-          <TransactionCard id ={5} type='event' amount={10} relatedId={3}/>
-          <TransactionCard id={1} remark="good deal" createdBy='joe999' amount={20} type='purchase' promotionIds={1} spent={5} />
-          <TransactionCard id={2} type='transfer' remark="pizza" amount={-15} utorid={'abcd123'} sender={'abcd123'} recipient={'plmn0987'} />
-          <TransactionCard id={3} type='redemption' suspicious={true} amount={-20} redeemed={true}/>
-          <TransactionCard id={4} type='adjustment' amount={5} relatedId={2}/>
-          <TransactionCard id ={5} type='event' amount={10} relatedId={3}/>
-          <p>No more transactions.</p>
+    <div className={styles.pageContainer}>
+      <main>
+        <h1>Promotions</h1>
+
+        <div style={{ marginBottom: 16 }}>
+          <PrimaryButton text="Create Promotion" onClick={() => window.location.href = '/promotion/create'} />
         </div>
-        
+
+        <div className={styles.resultsContainer}>
+          {loading && <div>Loading…</div>}
+          {err && <div style={{ color: 'red' }}>Error: {err}</div>}
+          {!loading && !err && promotions.length === 0 && <div>No promotions found</div>}
+
+          {!loading && !err && promotions.map(p => (
+            <div key={p.id} className={styles.resultsCard}>
+              <div style={{ padding: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontWeight: 600 }}>{p.name}</span>
+                  <span style={{ fontSize: 12, textTransform: 'uppercase' }}>{p.type}</span>
+                </div>
+                <div style={{ fontSize: 14, display: 'grid', gap: 4 }}>
+                  <div><strong>Start:</strong> {p.startTime ? new Date(p.startTime).toLocaleString() : '—'}</div>
+                  <div><strong>End:</strong> {p.endTime ? new Date(p.endTime).toLocaleString() : '—'}</div>
+                  {p.description && <div><strong>Description:</strong> {p.description}</div>}
+                  {p.minSpending != null && <div><strong>Min Spend:</strong> {p.minSpending}</div>}
+                  {p.rate != null && <div><strong>Rate:</strong> {p.rate}</div>}
+                  {p.points != null && <div><strong>Points:</strong> {p.points}</div>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
