@@ -1,0 +1,13 @@
+.balanceCard {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  margin: 16px;
+}
+.balanceCard span {
+  color: #c89e56; 
+  font-weight: bold;
+}
