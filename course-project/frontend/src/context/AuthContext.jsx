@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
         .then((data) => data.json())
         .then((data) => {
             setUser(data);
-            setCurrentInterface(currentInterface || data.role);
+            setCurrentInterface(data.role);
         })
         .finally(() => setInitializing(false));
     }
@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
     .then((data) => data.json())
     .then(userData => {
       setUser(userData);
-      setCurrentInterface(currentInterface || userData.role);
+      setCurrentInterface(userData.role);
     });
 
     router.push("/user"); // TODO: change to home page
@@ -81,13 +81,13 @@ export function AuthProvider({ children }) {
     .then((data) => data.json())
     .then(data => {
        setUser(data);
-       setCurrentInterface(currentInterface || data.role);
+       setCurrentInterface(data.role);
     });
   }
 
   const logout = () => {
       localStorage.removeItem("token");
-      localStorage.removeItem("interface");
+      setCurrentInterface(null);
       setToken(null);
       setUser(null);
 
