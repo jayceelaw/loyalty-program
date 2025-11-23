@@ -11,6 +11,7 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
 
 const backendURL = "http://localhost:4000";
@@ -68,6 +69,8 @@ export default function RegularUserPage() {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
+              <ReferenceLine y={0} stroke="red" strokeDasharray="3 3" />
+
               <Line
                 type="linear"
                 dataKey="points"

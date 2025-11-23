@@ -72,13 +72,13 @@
     display: none;
 }
 
-/* Optional color styling for buttons if needed */
+.buttons {
+    display: flex;
+    justify-content: space-between; 
+    margin-top: 8px;
+}
+
 .primaryButton {
     background-color: var(--color-primary-blue);
     color: white;
-}
-
-.secondaryButton {
-    background-color: var(--color-gray-light);
-    color: black;
 }

@@ -1,12 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { PrimaryButton, SecondaryButton, BackButton } from './Button';
-import styles from './EventCard.module.css';  
+import { PrimaryButton } from './Button';
+import styles from './EventCard.module.css';
 
-// Similar to TransactionCard
-
-// Get event data 
 export default function EventCard({
   id,
   name,
@@ -17,14 +14,26 @@ export default function EventCard({
   numGuests
 }) {
   const router = useRouter();
-
   const eventFull = numGuests >= capacity;
 
   const formatDateTime = (datetime) => {
     if (!datetime) return '';
     const d = new Date(datetime);
-    return d.toLocaleString(); 
-  }
+    const str = d.toLocaleString();       
+    return str.replace(/:\d{2}\s/, ' '); // remove seconds 
+  };
+
+  // YYYYMMDDTHHmmssZ
+  const toGoogleCalendarDate = (datetime) => {
+    return new Date(datetime).toISOString().replace(/-|:|\.\d{3}/g, '');
+  };
+
+  // Google calendar event link 
+  const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(
+    name
+  )}&dates=${toGoogleCalendarDate(startTime)}/${toGoogleCalendarDate(
+    endTime
+  )}&details=${encodeURIComponent('Remember to RSVP to event!')}&location=${encodeURIComponent(location)}`;
 
   return (
     <div className={styles.container}>
@@ -34,26 +43,36 @@ export default function EventCard({
       </div>
 
       <div className={styles.center}>
-        {/* <p><span className={styles.label}>Location:</span> {location}</p> */}
         <p>
           <span className={styles.label}>Location:</span>{' '}
+          {/* Google maps link */}
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              location
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={styles.mapLink}  
+            className={styles.mapLink}
           >
             {location}
           </a>
         </p>
-        <p><span className={styles.label}>Start:</span> {formatDateTime(startTime)}</p>
-        <p><span className={styles.label}>End:</span> {formatDateTime(endTime)}</p>
         <p>
-          <span className={styles.label}>Spots Filled:</span> {numGuests}/{capacity} {eventFull ? '(Full)' : ''}
+          <span className={styles.label}>Start:</span> {formatDateTime(startTime)}
+        </p>
+        <p>
+          <span className={styles.label}>End:</span> {formatDateTime(endTime)}
+        </p>
+        <p>
+          <span className={styles.label}>Spots Filled:</span> {numGuests}/{capacity}{' '}
+          {eventFull ? '(Full)' : ''}
         </p>
 
         <div className={styles.buttons}>
-          <PrimaryButton text="View →" onClick={() => router.push(`/event/${id}`)} />  
+          <PrimaryButton text="Add to Calendar" onClick={() => window.open(calendarUrl, '_blank')}
+          />
+          <PrimaryButton text="View →" onClick={() => router.push(`/event/${id}`)}
+          />
         </div>
       </div>
     </div>
