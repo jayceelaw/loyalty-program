@@ -71,7 +71,9 @@ export default function EventCard({
         <div className={styles.buttons}>
           <PrimaryButton text="Add to Calendar" onClick={() => window.open(calendarUrl, '_blank')}
           />
-          <PrimaryButton text="View →" onClick={() => router.push(`/event/${id}`)}
+          {/* Not sure how to push it to the event/[id] page */}
+          {/* <PrimaryButton text="View →" onClick={() => router.push(`/event/${id}`)}/> */}
+          <PrimaryButton text="View →" onClick={() => { localStorage.setItem("eventId", id); router.push("/event/details"); }}
           />
         </div>
       </div>

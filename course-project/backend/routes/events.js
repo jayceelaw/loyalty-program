@@ -234,7 +234,8 @@ router.get('/:eventId', jwtAuth, async (req, res) => {
                 pointsAwarded: e.pointsAwarded,
                 published: e.published,
                 organizers: (e.organizers || []).map(o => ({ id: o.id, utorid: o.utorid, name: o.name })),
-                guests: (e.guests || []).map(g => ({ id: g.id, utorid: g.utorid, name: g.name }))
+                // Added userId for guest objects for deleting guests 
+                guests: (e.guests || []).map(g => ({ id: g.id, utorid: g.utorid, name: g.name, userId: g.userId}))
             });
         }
 
