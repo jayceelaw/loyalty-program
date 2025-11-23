@@ -121,8 +121,10 @@ router.get('/', jwtAuth, async (req, res) => {
         }
 
         const where = {};
-        if (q.name) where.name = { contains: String(q.name), mode: 'insensitive' };
-        if (q.location) where.location = { contains: String(q.location), mode: 'insensitive' };
+        // if (q.name) where.name = { contains: String(q.name), mode: 'insensitive' };
+        // if (q.location) where.location = { contains: String(q.location), mode: 'insensitive' };
+        if (q.name) where.name = { contains: String(q.name) };
+        if (q.location) where.location = { contains: String(q.location) };
 
         const now = new Date();
 
