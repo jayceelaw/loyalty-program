@@ -203,3 +203,21 @@
   /* color: #fff !important; */
   border-color: rgb(97, 97, 97) !important;
 }
+
+/* delete button */
+
+.deleteDanger {
+  color: #ff0000 !important;
+  border-color: #ff0000 !important;
+}
+.deleteDanger:hover {
+  background: rgba(255, 0, 0, 0.06) !important;
+}
+
+.cardActions {
+  margin-top: auto;       
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  gap: 8px;
+}

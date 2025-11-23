@@ -3,6 +3,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import styles from './page.module.css';
 import PromotionSearchBar from '../components/PromotionSearchBar'
 import PrimaryActionDropDownButton from '../components/PrimaryActionDropDownButton';
+import { useAuth } from '../../context/AuthContext'; // adjust if you use a path alias
+import Button from '../components/Button'
+import colors from '../constants/colors';
 
 
 export default function PromotionsPage() {
@@ -29,6 +32,8 @@ export default function PromotionsPage() {
   const [appliedRateMin, setAppliedRateMin] = useState('');
   const [appliedMinSpendMin, setAppliedMinSpendMin] = useState('');
   const [appliedPointsMin, setAppliedPointsMin] = useState('');
+
+  const { currentInterface } = useAuth(); // assumes AuthContext provides this
 
   const fetchPromotions = useCallback(async (targetPage = 1, replace = true) => {
     if (!backend) return;
@@ -120,6 +125,47 @@ export default function PromotionsPage() {
     const atBottom = t.scrollTop + t.clientHeight >= t.scrollHeight - 80;
     if (atBottom && !reachedEnd && !loading) {
       fetchPromotions(page, false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!backend) return;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) { console.warn('[Delete] no token'); return; }
+    if (!['manager','superuser'].includes(currentInterface)) {
+      console.warn('[Delete] interface not allowed:', currentInterface);
+      return;
+    }
+    if (!window.confirm(`Delete promotion #${id}?`)) return;
+
+    try {
+      const url = `${backend}/promotions/${id}`;
+      console.log('[Delete] DELETE', url);
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.status === 204) {
+        console.log('[Delete] success (204) for id:', id);
+        setPromotions(prev => prev.filter(p => p.id !== id));
+        alert('Successfully deleted promotion.');
+        return;
+      }
+
+      let bodyText = '';
+      try { bodyText = await res.text(); } catch {}
+      console.warn('[Delete] non-204 status:', res.status, 'body:', bodyText);
+
+      if (res.status === 403) {
+        // returns 403 when promotion already started or role insufficient
+        alert('Cannot delete: promotion already started or insufficient permissions.');
+      } else {
+        alert(`Delete failed (${res.status}). ${bodyText || ''}`);
+      }
+    } catch (e) {
+      console.error('[Delete] network/error:', e);
+      alert(`Delete failed: ${e.message || 'Network error'}`);
     }
   };
 
@@ -226,7 +272,9 @@ export default function PromotionsPage() {
                 <div key={p.id} className={styles.resultItem}>
                   <div style={{ marginBottom: 8 }}>
                     <span className={styles.promotionName}>{p.name}</span>
-                    <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>ID: {p.id}</div>
+                    {['manager','superuser'].includes(currentInterface) && (
+                      <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>ID: {p.id}</div>
+                    )}
                     <div><strong>Start:</strong> {p.startTime ? new Date(p.startTime).toLocaleString() : '—'}</div>
                     <div><strong>End:</strong> {p.endTime ? new Date(p.endTime).toLocaleString() : '—'}</div>
                     {p.description && <div><strong>Description:</strong> {p.description}</div>}
@@ -235,6 +283,20 @@ export default function PromotionsPage() {
                     {p.points != null && <div><strong>Points:</strong> {p.points}</div>}
                   </div>
                   <span className={styles.roleBadge} style={{ textTransform: 'uppercase' }}>{p.type}</span>
+
+                  {['manager','superuser'].includes(currentInterface) && (
+                    <div className={styles.cardActions}>
+                      <Button
+                        type="button"
+                        variant='secondary'
+                        onClick={() => handleDelete(p.id)}
+                        className={`${styles.deleteBtn} ${styles.deleteDanger}`}
+
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
               {reachedEnd && promotions.length > 0 && <div style={{ padding: 8, opacity: 0.6 }}>End</div>}
