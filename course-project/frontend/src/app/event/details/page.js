@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
 import Notification from '../../components/Notification';
-import styles from './page.module.css';
+import styles from '../event.module.css';
 
 export default function EventDetailPage() {
     const router = useRouter();
@@ -119,49 +119,51 @@ export default function EventDetailPage() {
     const isCapacityFull = event.numGuests >= event.capacity;
 
     return (
-        <main className={styles.container}>
-            <h1>{event.name}</h1>
-            <p><strong>Description:</strong> {event.description || 'RSVP to event!'}</p>
-            <p><strong>Location:</strong> {event.location || 'TBC'}</p>
-            <p><strong>Start:</strong> {new Date(event.startTime).toLocaleString(undefined, {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', hour12: true
-            })}</p>
-            <p><strong>End:</strong> {new Date(event.endTime).toLocaleString(undefined, {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', hour12: true
-            })}</p>
-            <p><strong>Spots Filled:</strong> {actualNumGuests}/{event.capacity}</p>
+        <main className={styles.container}> 
+            <div className={styles.eventContentWrapper}>
+                <h1>{event.name}</h1>
+                <p><strong>Description:</strong> {event.description || 'RSVP to event!'}</p>
+                <p><strong>Location:</strong> {event.location || 'TBC'}</p>
+                <p><strong>Start:</strong> {new Date(event.startTime).toLocaleString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                })}</p>
+                <p><strong>End:</strong> {new Date(event.endTime).toLocaleString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                })}</p>
+                <p><strong>Spots Filled:</strong> {actualNumGuests}/{event.capacity}</p>
 
-            {isManagerOrOrganizer ? ( 
-                <div className={styles.buttonGroup}>
-                    <PrimaryButton
-                        text="Add or Remove Guest"
-                        onClick={() => {localStorage.setItem("eventId", id); router.push("/event/addGuest");}}
-                    />
-                    <PrimaryButton
-                        text="Award Points"
-                        onClick={() => {localStorage.setItem("eventId", id); router.push("/event/awardGuest");}}
-                    />
-                </div>
-            ) : (
-                <div className={styles.rsvpButtonWrapper}>
-                    <PrimaryButton
-                        text={isCapacityFull ? 'Event Full' : rsvpButtonText}
-                        onClick={handleRSVP}
-                        disabled={loading || isUserRsvped || isCapacityFull}
-                        className={rsvpButtonClass}
-                    />
-                </div>
-            )}
+                {isManagerOrOrganizer ? ( 
+                    <div className={styles.buttonGroup}>
+                        <PrimaryButton
+                            text="Add or Remove Guest"
+                            onClick={() => {localStorage.setItem("eventId", id); router.push("/event/addGuest");}}
+                        />
+                        <PrimaryButton
+                            text="Award Points"
+                            onClick={() => {localStorage.setItem("eventId", id); router.push("/event/awardGuest");}}
+                        />
+                    </div>
+                ) : (
+                    <div className={styles.rsvpButtonWrapper}>
+                        <PrimaryButton
+                            text={isCapacityFull ? 'Event Full' : rsvpButtonText}
+                            onClick={handleRSVP}
+                            disabled={loading || isUserRsvped || isCapacityFull}
+                            className={rsvpButtonClass}
+                        />
+                    </div>
+                )}
 
-            {/* Notification */}
-            <Notification
-                message={notification.message}
-                isVisible={notification.isVisible}
-                onClose={closeNotification}
-                type={notification.type}
-            />
+                {/* Notification */}
+                <Notification
+                    message={notification.message}
+                    isVisible={notification.isVisible}
+                    onClose={closeNotification}
+                    type={notification.type}
+                /> 
+            </div>
         </main>
     );
 }

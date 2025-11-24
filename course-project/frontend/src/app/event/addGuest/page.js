@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
 import Notification from '../../components/Notification';
-import styles from './page.module.css';
+import styles from '../event.module.css';
 
 export default function AddGuestsPage() {
     const router = useRouter();
@@ -121,68 +121,70 @@ export default function AddGuestsPage() {
     }));
 
     return (
-        <main className={styles.container}>
-            <div className={styles.header}>
-                {/* <button className={styles.backButton} onClick={() => router.back()}>
-                    ← Back to Event
-                </button> */}
-                <h1>Manage Guests for {event.name}</h1>
-            </div>
+        <main className={styles.container}> 
+            <div className={styles.addGuestsWrapper}> 
+                <div className={styles.header}>
+                    {/* <button className={styles.backButton} onClick={() => router.back()}>
+                        ← Back to Event
+                    </button> */}
+                    <h1>Manage Guests for {event.name}</h1>
+                </div>
 
-            <section className={styles.formSection}>
-                <h3>Add Guest</h3>
-                <form onSubmit={handleAddGuest} className={styles.form}>
-                    <input
-                        type="text"
-                        placeholder="Enter UTORID"
-                        value={newGuestUtorid}
-                        onChange={(e) => setNewGuestUtorid(e.target.value)}
-                        required
-                        className={styles.input}
-                        disabled={actionLoading}
-                    />
-                    <PrimaryButton
-                        text={actionLoading ? 'Adding...' : 'Add'}
-                        type="submit"
-                        disabled={actionLoading || !newGuestUtorid}
-                    />
-                </form>
-            </section>
-
-            {canRemove && (
                 <section className={styles.formSection}>
-                    <h3>Remove Guest</h3>
-                    <div className={styles.form}>
-                        <select
-                            className={styles.dropdown}
-                            value={selectedUserId}
-                            onChange={(e) => setSelectedUserId(e.target.value)}
-                            disabled={actionLoading || guestOptions.length === 0}
-                        >
-                            <option value="">Select Guest by User ID</option>
-                            {guestOptions.map(opt => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-
-                        <PrimaryButton
-                            text={actionLoading ? 'Removing...' : 'Remove'}
-                            onClick={handleRemoveGuest}
-                            className={styles.removeButton}
-                            disabled={actionLoading || !selectedUserId}
+                    <h3>Add Guest</h3>
+                    <form onSubmit={handleAddGuest} className={styles.form}>
+                        <input
+                            type="text"
+                            placeholder="Enter UTORID"
+                            value={newGuestUtorid}
+                            onChange={(e) => setNewGuestUtorid(e.target.value)}
+                            required
+                            className={styles.input}
+                            disabled={actionLoading}
                         />
-                    </div>
+                        <PrimaryButton
+                            text={actionLoading ? 'Adding...' : 'Add'}
+                            type="submit"
+                            disabled={actionLoading || !newGuestUtorid}
+                        />
+                    </form>
                 </section>
-            )}
 
-            <Notification
-                message={notification.message}
-                isVisible={notification.isVisible}
-                onClose={closeNotification}
-                type={notification.type}
-            />
+                {canRemove && (
+                    <section className={styles.formSection}>
+                        <h3>Remove Guest</h3>
+                        <div className={styles.form}>
+                            <select
+                                className={styles.dropdown}
+                                value={selectedUserId}
+                                onChange={(e) => setSelectedUserId(e.target.value)}
+                                disabled={actionLoading || guestOptions.length === 0}
+                            >
+                                <option value="">Select Guest by User ID</option>
+                                {guestOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <PrimaryButton
+                                text={actionLoading ? 'Removing...' : 'Remove'}
+                                onClick={handleRemoveGuest}
+                                className={styles.removeButton}
+                                disabled={actionLoading || !selectedUserId}
+                            />
+                        </div>
+                    </section>
+                )}
+
+                <Notification
+                    message={notification.message}
+                    isVisible={notification.isVisible}
+                    onClose={closeNotification}
+                    type={notification.type}
+                />
+            </div>
         </main>
     );
 }
