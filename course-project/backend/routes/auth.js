@@ -83,7 +83,8 @@ router.post('/resets', async (req, res) => {
     ipRequests[ip] = now;
     const resetInfo = {
         expiresAt: new Date(now + 60 * 60 * 1000), // 1 hour later
-        resetToken: uuid()
+        resetToken: uuid(),
+        email: user.email
     }
 
     await prisma.user.update({

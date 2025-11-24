@@ -10,8 +10,7 @@ export default function ResetPasswordForm() {
   const router = useRouter();
 
   const [step, setStep] = useState(1); // 1 = token input, 2 = set new password 
-  const [token, setToken] = useState(sessionStorage.getItem('resetToken')); // prefills token (TODO: remove)
-//   const [utorid, setUtorid] = useState(sessionStorage.getItem('utorid'));
+  const [token, setToken] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -82,15 +81,14 @@ export default function ResetPasswordForm() {
 
 		{/* enter reset token */}
         {step === 1 && (<>
-		  <h2 className={styles.note}>Please use the generated token within 1 hour to reset your password.</h2>
+		  <h2 className={styles.note}>A token has been sent to your email. Please use it within 1 hour to reset your password.</h2>
 		  
           <form className={styles.form} onSubmit={submitResetToken} noValidate>
             <label className={styles.label}>
               Reset token
               <input
                 className={styles.input}
-				value={token}
-				defaultValue={sessionStorage.getItem('resetToken')} // prefills token (TODO: remove)
+                value={token}
                 onChange={(e) => setToken(e.target.value)}
                 placeholder="Paste the reset token"
                 required
@@ -139,7 +137,7 @@ export default function ResetPasswordForm() {
             {success && <div className={styles.success}>{success}</div>}
 
             <div className={styles.actions}>
-              <Button kind="ghost" onClick={() => router.push('/login')}>Back</Button>
+              <Button kind="ghost" onClick={() => setStep(1)}>Back</Button>
               <Button onClick={submitNewPassword} disabled={loading}>{loading ? 'Setting…' : 'Set Password'}</Button>
             </div>
           </form>
