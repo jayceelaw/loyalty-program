@@ -317,3 +317,39 @@
     background-color: #a5a5a5 !important; 
     opacity: 0.7;
 }
+
+
+/* Event Creation and Update Pages */
+
+/* Form container */
+.createForm {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+/* Full-width inputs for Promotion Name + Description */
+.fullWidthInput {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Two-column layout */
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+/* Columns themselves */
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

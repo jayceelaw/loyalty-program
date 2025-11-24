@@ -118,7 +118,6 @@ export default function CreatePromotion() {
 
             </div>
 
-            {/* Message + Submit (outside of form box) */}
             <div className={styles.footer}>
                 <PrimaryButton className="submit" text="Create" onClick={handleSend}/>
                 <p className={`${styles.message} ${error ? styles.error : styles.success}`}>

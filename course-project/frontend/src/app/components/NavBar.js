@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import TransactionMenu from "./TransactionMenu";
 import PromotionMenu from "./PromotionMenu";
+import EventMenu from "./EventMenu";
 import { useAuth } from '../../context/AuthContext.jsx';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './NavigationBar.module.css';
@@ -21,11 +22,15 @@ export default function NavBar() {
   const navItems = [
     { label: 'Dashboard', path: '/user' },
     { label: 'QR', path: '/user/qr' },
-    { label: 'Events', path: '/event' },
+    // { label: 'Events', path: '/event' },
   ];
-  if (!PromotionMenu()) { // only 1 option in dropdown
+  if (!EventMenu()) {
+    navItems.push({ label: 'Events', path: '/event' });
+  }
+  if (!PromotionMenu()) {
     navItems.push({ label: 'Promotions', path: '/promotion' });
   }
+  
   const specialItems = [];
   if (currentInterface === "cashier" || currentInterface === "manager" || currentInterface === "superuser" ) {
     specialItems.push({ label: 'Register User', path: '/user/register' });
@@ -105,6 +110,7 @@ export default function NavBar() {
               {item.label}
             </Link>
           ))}
+          <EventMenu/>
           <PromotionMenu/>
           <TransactionMenu/>
 
