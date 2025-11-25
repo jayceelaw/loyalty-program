@@ -500,6 +500,26 @@
   width: 300px;
   margin: 0 auto; 
 }
+ 
+.fullHeightCashierResultsCard { 
+    height: calc(100vh - 72px - 40px);  
+    display: flex;  
+    flex-direction: column;
+    justify-content: flex-start; 
+    align-items: center;  
+    padding: 3%; 
+}
+
+.largeButtons {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;   
+    gap: 40px;  
+    width: 80%; 
+    margin: 40px auto; 
+    flex-grow: 1; 
+    justify-content: space-evenly;
+}
 
 .cashierDataSection {
   margin-top: 50px;  
