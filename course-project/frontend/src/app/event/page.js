@@ -16,7 +16,7 @@ export default function EventsListPage() {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const scrollRef = useRef();
-  const backendURL = 'http://localhost:4000';
+  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const loadData = async (specificPage = 1) => {
     setLoading(true);
@@ -78,10 +78,16 @@ export default function EventsListPage() {
       <EventFilter setFilter={setFilter} />
       <div ref={scrollRef} onScroll={handleScroll} className={styles.infiniteScroll}>
         {events.map((e, index) => (
-          <EventCard key={index} {...e} />
+          <EventCard
+            key={e.id}
+            {...e}
+            canDelete={['manager','superuser'].includes(user?.role)}
+            onDelete={(deletedId) => setEvents(prev => prev.filter(ev => ev.id !== deletedId))}
+          />
         ))}
         {end && <p>No more events.</p>}
       </div>
     </div>
+    
   );
 }

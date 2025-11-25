@@ -11,24 +11,58 @@ export default function EventCard({
   startTime,
   endTime,
   capacity,
-  numGuests
+  numGuests,
+  canDelete = false,
+  onDelete
 }) {
   const router = useRouter();
+  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const eventFull = numGuests >= capacity;
+
+  const handleDelete = async () => {
+    if (!backendURL) return;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) { console.warn('[Delete] no token'); return; }
+    if (!window.confirm(`Delete event #${id}?`)) return;
+
+    try {
+      const url = `${backendURL}/events/${id}`;
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.status === 204) {
+        onDelete && onDelete(id);
+        alert('Successfully deleted event.');
+        return;
+      }
+
+      let bodyText = '';
+      try { bodyText = await res.text(); } catch {}
+      console.warn('[Delete] non-204 status:', res.status, 'body:', bodyText);
+
+      if (res.status === 400) {
+        alert('Cannot delete: event already published.');
+      } else {
+        alert(`Delete failed (${res.status}). ${bodyText || ''}`);
+      }
+    } catch (e) {
+      console.error('[Delete] network/error:', e);
+      alert(`Delete failed: ${e.message || 'Network error'}`);
+    }
+  };
 
   const formatDateTime = (datetime) => {
     if (!datetime) return '';
     const d = new Date(datetime);
-    const str = d.toLocaleString();       
-    return str.replace(/:\d{2}\s/, ' '); // remove seconds 
+    const str = d.toLocaleString();
+    return str.replace(/:\d{2}\s/, ' ');
   };
 
-  // YYYYMMDDTHHmmssZ
-  const toGoogleCalendarDate = (datetime) => {
-    return new Date(datetime).toISOString().replace(/-|:|\.\d{3}/g, '');
-  };
+  const toGoogleCalendarDate = (datetime) =>
+    new Date(datetime).toISOString().replace(/-|:|\.\d{3}/g, '');
 
-  // Google calendar event link 
   const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(
     name
   )}&dates=${toGoogleCalendarDate(startTime)}/${toGoogleCalendarDate(
@@ -37,47 +71,54 @@ export default function EventCard({
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <p className={styles.id}>ID: {id}</p>
-        <p className={styles.name}>{name}</p>
-      </div>
+      <div className={styles.row}>
+        <div className={styles.left}>
+          <p className={styles.id}>ID: {id}</p>
+          <p>
+            <span className={styles.label}>Location:</span>{' '}
+            <a
+              href={`https://maps.google.com/?q=${encodeURIComponent(location)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.mapLink}
+            >
+              {location}
+            </a>
+          </p>
+          <p><span className={styles.label}>Start:</span> {formatDateTime(startTime)}</p>
+          <p><span className={styles.label}>End:</span> {formatDateTime(endTime)}</p>
+          <p>
+            <span className={styles.label}>Spots Filled:</span> {numGuests}/{capacity}{' '}
+            {eventFull ? '(Full)' : ''}
+          </p>
+        </div>
 
-      <div className={styles.center}>
-        <p>
-          <span className={styles.label}>Location:</span>{' '}
-          {/* Google maps link */}
-          <a
-            // href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            //   location
-            // )}`}
-            href={`https://maps.google.com/?q=${encodeURIComponent(
-              location
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.mapLink}
-          >
-            {location}
-          </a>
-        </p>
-        <p>
-          <span className={styles.label}>Start:</span> {formatDateTime(startTime)}
-        </p>
-        <p>
-          <span className={styles.label}>End:</span> {formatDateTime(endTime)}
-        </p>
-        <p>
-          <span className={styles.label}>Spots Filled:</span> {numGuests}/{capacity}{' '}
-          {eventFull ? '(Full)' : ''}
-        </p>
-
-        <div className={styles.buttons}>
-          <PrimaryButton text="Add to Calendar" onClick={() => window.open(calendarUrl, '_blank')}
-          />
-          {/* Not sure how to push it to the event/[id] page */}
-          {/* <PrimaryButton text="View →" onClick={() => router.push(`/event/${id}`)}/> */}
-          <PrimaryButton text="View →" onClick={() => { localStorage.setItem("eventId", id); router.push("/event/details"); }}
-          />
+        <div className={styles.right}>
+          <div className={styles.titleArea}>
+            <p className={styles.name} >{name}</p>
+          </div>
+          <div className={styles.buttonsCol}>
+            <PrimaryButton
+              text="Add to Calendar"
+              onClick={() => window.open(calendarUrl, '_blank')}
+            />
+            {canDelete && (
+              <button
+                type="button"
+                className={`${styles.deleteBtn} ${styles.deleteDanger}`}
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            )}
+            <PrimaryButton
+              text="View →"
+              onClick={() => {
+                localStorage.setItem('eventId', String(id));
+                router.push('/event/details');
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
