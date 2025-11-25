@@ -15,7 +15,8 @@ build/
 .env.local
 .env.*.local
 .env.*.secret
-
+frontend/.env
+backend/.env
 
 frontend/node_modules/*
 backend/node_modules/*

@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import styles from './page.module.css';
 import PromotionSearchBar from '../components/PromotionSearchBar'
 import PrimaryActionDropDownButton from '../components/PrimaryActionDropDownButton';
-import { useAuth } from '../../context/AuthContext'; // adjust if you use a path alias
+import { useAuth } from '../../context/AuthContext'; 
 import Button from '../components/Button'
 import colors from '../constants/colors';
 
@@ -19,21 +19,21 @@ export default function PromotionsPage() {
   const [searchName, setSearchName] = useState(''); // input field value
   const [appliedSearchTerm, setAppliedSearchTerm] = useState(''); // term actually used for filtering
 
-  // NEW: pending inputs for filters (commit on Search)
+  // pending inputs for filters (commit on Search)
   const [startAfter, setStartAfter] = useState('');       // datetime-local string
   const [endBefore, setEndBefore] = useState('');         // datetime-local string
   const [rateMin, setRateMin] = useState('');             // number string
   const [minSpendMin, setMinSpendMin] = useState('');     // number string
   const [pointsMin, setPointsMin] = useState('');         // number string
 
-  // NEW: applied filters (used by fetch)
+  //  applied filters (used by fetch)
   const [appliedStartAfter, setAppliedStartAfter] = useState('');
   const [appliedEndBefore, setAppliedEndBefore] = useState('');
   const [appliedRateMin, setAppliedRateMin] = useState('');
   const [appliedMinSpendMin, setAppliedMinSpendMin] = useState('');
   const [appliedPointsMin, setAppliedPointsMin] = useState('');
 
-  const { currentInterface } = useAuth(); // assumes AuthContext provides this
+  const { currentInterface } = useAuth(); 
 
   const fetchPromotions = useCallback(async (targetPage = 1, replace = true) => {
     if (!backend) return;
@@ -272,9 +272,7 @@ export default function PromotionsPage() {
                 <div key={p.id} className={styles.resultItem}>
                   <div style={{ marginBottom: 8 }}>
                     <span className={styles.promotionName}>{p.name}</span>
-                    {['manager','superuser'].includes(currentInterface) && (
-                      <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>ID: {p.id}</div>
-                    )}
+                    <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>ID: {p.id}</div>
                     <div><strong>Start:</strong> {p.startTime ? new Date(p.startTime).toLocaleString() : '—'}</div>
                     <div><strong>End:</strong> {p.endTime ? new Date(p.endTime).toLocaleString() : '—'}</div>
                     {p.description && <div><strong>Description:</strong> {p.description}</div>}
@@ -283,15 +281,13 @@ export default function PromotionsPage() {
                     {p.points != null && <div><strong>Points:</strong> {p.points}</div>}
                   </div>
                   <span className={styles.roleBadge} style={{ textTransform: 'uppercase' }}>{p.type}</span>
-
                   {['manager','superuser'].includes(currentInterface) && (
                     <div className={styles.cardActions}>
                       <Button
                         type="button"
-                        variant='secondary'
+                        variant="secondary"
                         onClick={() => handleDelete(p.id)}
                         className={`${styles.deleteBtn} ${styles.deleteDanger}`}
-
                       >
                         Delete
                       </Button>
