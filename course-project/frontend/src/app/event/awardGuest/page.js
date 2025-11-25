@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
@@ -11,12 +11,12 @@ import styles from '../event.module.css';
 export default function AwardGuestPage() {
     const router = useRouter();
     const { user } = useAuth();
-    // Get eventId from storage cause I still haven't figure out [id]
-    const eventId = typeof window !== 'undefined' ? localStorage.getItem('eventId') : null;
+    const [currentEventId, setCurrentEventId] = useState('');
     const [utorid, setUtorid] = useState('');
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
     const [event, setEvent] = useState(null);
+    const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const backendURL = 'http://localhost:4000';
@@ -25,42 +25,55 @@ export default function AwardGuestPage() {
     const showNotification = (message, type) => setNotification({ isVisible: true, message, type });
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
-    // Fetch event
-    const fetchEvent = async () => {
-        if (!eventId) {
-            setLoading(false);
-            return;
-        }
+    // Fetch event 
+    const fetchEvent = useCallback(async (eventId) => {
+        if (!eventId) return;
+        setLoading(true);
+        setError('');
+
         try {
             const res = await fetch(`${backendURL}/events/${eventId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}`, },
             });
-
             if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Failed to load event. ');
+                const { error } = await res.json();
+                setEvent(null);
+                throw new Error(error || 'Failed to fetch event');
             }
             const data = await res.json();
             setEvent(data);
         } catch (err) {
-            showNotification(`Error fetching event: ${err.message}`, 'error');
-            setEvent(null);
+            setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
+    // Load eventId, check if have 
     useEffect(() => {
-        if (eventId && user) {
-            fetchEvent();
-        } else if (!eventId) {
+        const idFromStorage = typeof window !== 'undefined' ? localStorage.getItem('eventId') : null;
+        if (idFromStorage) {
+            setCurrentEventId(idFromStorage);
+            localStorage.removeItem('eventId');
+        } else {
             setLoading(false);
         }
-    }, [eventId, user]);
+    }, []);
+
+    // fetch event runs when currentEventId changes 
+    useEffect(() => {
+        if (currentEventId && user) {
+            fetchEvent(currentEventId);
+        } else {
+            setEvent(null);
+            setError('');
+            setLoading(false);
+        }
+    }, [currentEventId, user, fetchEvent]);
 
     // Award points
     const handleAwardPoints = async () => {
-        if (isSubmitting) return;
+        if (isSubmitting || !currentEventId) return;
 
         const points = parseInt(amount, 10);
 
@@ -83,7 +96,7 @@ export default function AwardGuestPage() {
         }
 
         try {
-            const res = await fetch(`${backendURL}/events/${eventId}/transactions`, {
+            const res = await fetch(`${backendURL}/events/${currentEventId}/transactions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +121,7 @@ export default function AwardGuestPage() {
                 setUtorid('');
                 setAmount('');
                 setRemark('');
-                fetchEvent();
+                fetchEvent(currentEventId);
             } else {
                 showNotification(`Error: ${data.error || 'Failed to award points.'}`, 'error');
             }
@@ -117,70 +130,82 @@ export default function AwardGuestPage() {
         } finally {
             setIsSubmitting(false);
         }
-
     };
 
-    if (loading) return <p>Loading event details...</p>;
-
-    if (!event) return <p>Error: Could not load event details for ID {eventId}.</p>;
-
+    const displayPoints = event?.pointsRemain || 0;
+    const isFormDisabled = !event || loading || isSubmitting;
     // button
-    const isAwardingAll = utorid.trim() === '';
-    const displayAmount = amount || '0';
-    const buttonText = isAwardingAll
-        ? `Award ${displayAmount} Points to All Guests`
-        : `Award ${displayAmount} Points to Guest ${utorid.trim()}`;
+    const buttonText =
+        utorid.trim() === ''
+            ? `Award ${amount || 0} Points to All Guests`
+            : `Award ${amount || 0} to ${utorid.trim()}`;
 
     return (
-        <main className={styles.container}> 
+        <main className={styles.container}>
             <div className={styles.awardPointsWrapper}>
-                <h1>Award Points for {event.name}</h1>
-
+                <h1>Award Points</h1> 
                 <p className={styles.pointsStatus}>
-                    Total Points Remaining: {event.pointsRemain}
+                    Total Points Remaining: {displayPoints}
                 </p>
 
+                {/* Event ID */}
                 <div className={styles.awardFormSection}>
-                    <label htmlFor="utorid">Guest UTORID (Leave empty to award all confirmed guests):</label>
+                    <label>Event ID:</label>
                     <input
-                        id="utorid"
-                        type="text"
+                        className={styles.awardInputField}
+                        value={currentEventId}
+                        disabled={isSubmitting}
+                        placeholder="Enter Event ID"
+                        onChange={(e) => {
+                            setCurrentEventId(e.target.value.trim());
+                            setEvent(null); // reset points
+                        }}
+                    />
+                </div>
+
+                {/* Status based on eventId */}
+                {loading && currentEventId && <p>Loading event details...</p>}
+                {currentEventId && !loading && !event && (<p style={{ color: 'red' }}>Invalid event ID or event not found.</p>)}
+
+                {/* Remaining form */}
+                <div className={styles.awardFormSection}>
+                    <label>Guest UTORID (optional):</label>
+                    <input
+                        className={styles.awardInputField}
                         value={utorid}
+                        disabled={isFormDisabled}
                         onChange={(e) => setUtorid(e.target.value)}
                         placeholder="UTORID"
-                        className={styles.awardInputField}
                     />
 
-                    <label htmlFor="amount">Points:</label>
+                    <label>Points:</label>
                     <input
-                        id="amount"
+                        className={styles.awardInputField}
+                        value={amount}
+                        disabled={isFormDisabled}
                         type="number"
                         min="1"
-                        step="1"
-                        value={amount}
                         onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ''))}
-                        placeholder="Enter Amount"
-                        className={styles.awardInputField}
+                        placeholder="Enter amount"
                     />
 
-                    <label htmlFor="remark">Remark (Optional):</label>
+                    <label>Remark (optional):</label>
                     <TextBox
-                        id="remark"
                         value={remark}
+                        disabled={isFormDisabled}
                         onChange={setRemark}
-                        placeholder=" "
                         rows={2}
                     />
-
                     <PrimaryButton
                         text={buttonText}
                         onClick={handleAwardPoints}
+                        disabled={isFormDisabled || !amount || parseInt(amount) <= 0}
                         className={styles.awardButton}
-                        disabled={isSubmitting || !amount || parseInt(amount, 10) <= 0}
                     />
                 </div>
             </div>
 
+            {/* Notification */}
             <Notification
                 message={notification.message}
                 isVisible={notification.isVisible}

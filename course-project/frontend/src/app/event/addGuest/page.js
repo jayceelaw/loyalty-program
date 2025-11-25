@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
@@ -10,6 +10,7 @@ import styles from '../event.module.css';
 export default function AddGuestsPage() {
     const router = useRouter();
     const { user } = useAuth();
+    const [currentEventId, setCurrentEventId] = useState('');
     const [event, setEvent] = useState(null);
     const [selectedUserId, setSelectedUserId] = useState('');
     const [newGuestUtorid, setNewGuestUtorid] = useState('');
@@ -23,17 +24,22 @@ export default function AddGuestsPage() {
     const showNotification = (message, type = 'success') => setNotification({ isVisible: true, message, type });
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
-    const eventId = typeof window !== 'undefined' ? localStorage.getItem('eventId') : null;
+    // Fetch Event
+    const fetchEvent = useCallback(async (eventId) => {
+        if (!eventId) return;
+        setLoading(true);
+        setError('');
 
-    // Fetch events 
-    const fetchEvent = async () => {
         try {
             const res = await fetch(`${backendURL}/events/${eventId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
             });
             if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || 'Failed to fetch event');
+                const { error } = await res.json();
+                setEvent(null);
+                throw new Error(error || 'Failed to fetch event');
             }
             const data = await res.json();
             setEvent(data);
@@ -42,94 +48,114 @@ export default function AddGuestsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    // Load eventId, check if have 
+    useEffect(() => {
+        const idFromStorage =
+            typeof window !== 'undefined' ? localStorage.getItem('eventId') : null;
+
+        if (idFromStorage) {
+            setCurrentEventId(idFromStorage);
+            localStorage.removeItem('eventId');
+        }
+        setLoading(false);
+    }, []);
 
     useEffect(() => {
-        if (!eventId || !user) return;
-        fetchEvent();
-    }, [eventId, user]);
+        if (currentEventId && user) {
+            fetchEvent(currentEventId);
+        } else {
+            setEvent(null);
+            setError('');
+        }
+    }, [currentEventId, user, fetchEvent]);
 
-    // Only managers and supervisors can remove guests
+    // role
     const isManagerOrSuperuser = ['manager', 'superuser'].includes(user?.role);
     const canRemove = isManagerOrSuperuser;
 
-    // Add guest
+    // add guests
     const handleAddGuest = async (e) => {
         e.preventDefault();
+        if (!currentEventId) return showNotification('Please enter an Event ID first.', 'error');
         setActionLoading(true);
-
         try {
-            const res = await fetch(`${backendURL}/events/${eventId}/guests`, {
+            const res = await fetch(`${backendURL}/events/${currentEventId}/guests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify({ utorid: newGuestUtorid.trim() })
+                body: JSON.stringify({ utorid: newGuestUtorid.trim() }),
             });
+
             const data = await res.json();
 
             if (res.ok) {
-                showNotification(`${data.guestAdded.name} added! (Guest ID: ${data.id}; User ID: ${data.guestAdded.id})`);
+                showNotification(`${data.guestAdded.name} added!`);
                 setNewGuestUtorid('');
-                await fetchEvent();
+                fetchEvent(currentEventId);
             } else {
                 showNotification(data.error || 'Failed to add guest.', 'error');
             }
-        } catch {
-            showNotification('Try again later.', 'error');
         } finally {
             setActionLoading(false);
         }
     };
 
-    // Remove Guest
+    // remove guest
     const handleRemoveGuest = async () => {
-        if (!selectedUserId || !canRemove) return;
+        if (!selectedUserId || !canRemove || !currentEventId) return;
         setActionLoading(true);
 
         try {
-            const res = await fetch(`${backendURL}/events/${eventId}/guests/${selectedUserId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-
-            if (res.status === 204 || res.ok) {
-                showNotification('Guest removed!', 'success');
+            const res = await fetch(
+                `${backendURL}/events/${currentEventId}/guests/${selectedUserId}`,
+                {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                }
+            );
+            if (res.ok) {
+                showNotification('Guest removed!');
                 setSelectedUserId('');
-                await fetchEvent();
+                fetchEvent(currentEventId);
             } else {
                 const data = await res.json();
                 showNotification(data.error || 'Failed to remove guest', 'error');
             }
-        } catch {
-            showNotification('Server error. Try again later.', 'error');
         } finally {
             setActionLoading(false);
         }
     };
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error}</p>;
-    if (!event) return <p>Event details not available.</p>;
-
-    const guestOptions = (event.guests || [])
-    .filter(g => g.userId != null)
-    .map(g => ({
+    const guestOptions = event?.guests?.map((g) => ({
         label: `User ID: ${g.userId}`,
-        value: String(g.userId)
-    }));
+        value: String(g.userId),
+    })) || [];
 
     return (
-        <main className={styles.container}> 
-            <div className={styles.addGuestsWrapper}> 
-                <div className={styles.header}>
-                    {/* <button className={styles.backButton} onClick={() => router.back()}>
-                        ← Back to Event
-                    </button> */}
-                    <h1>Manage Guests for {event.name}</h1>
-                </div>
+        <main className={styles.container}>
+            <div className={styles.addGuestsWrapper}>
+                <h1>Manage Guests</h1>
 
+                {/* Event id */}
+                <section className={styles.formSection}>
+                    <h3>Event ID</h3>
+                    <input
+                        type="text"
+                        placeholder="Enter Event ID"
+                        value={currentEventId}
+                        onChange={(e) => {
+                            setCurrentEventId(e.target.value.trim());
+                            setEvent(null);
+                        }}
+                        className={styles.input}
+                    />
+                </section>
+
+                {/* Add guest */}
                 <section className={styles.formSection}>
                     <h3>Add Guest</h3>
                     <form onSubmit={handleAddGuest} className={styles.form}>
@@ -138,46 +164,44 @@ export default function AddGuestsPage() {
                             placeholder="Enter UTORID"
                             value={newGuestUtorid}
                             onChange={(e) => setNewGuestUtorid(e.target.value)}
+                            disabled={actionLoading || !currentEventId}
                             required
                             className={styles.input}
-                            disabled={actionLoading}
                         />
                         <PrimaryButton
                             text={actionLoading ? 'Adding...' : 'Add'}
                             type="submit"
-                            disabled={actionLoading || !newGuestUtorid}
+                            disabled={!currentEventId || actionLoading || !newGuestUtorid}
                         />
                     </form>
                 </section>
 
+                {/* Remove guest */}
                 {canRemove && (
                     <section className={styles.formSection}>
                         <h3>Remove Guest</h3>
-                        <div className={styles.form}>
-                            <select
-                                className={styles.dropdown}
-                                value={selectedUserId}
-                                onChange={(e) => setSelectedUserId(e.target.value)}
-                                disabled={actionLoading || guestOptions.length === 0}
-                            >
-                                <option value="">Select Guest by User ID</option>
-                                {guestOptions.map(opt => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <PrimaryButton
-                                text={actionLoading ? 'Removing...' : 'Remove'}
-                                onClick={handleRemoveGuest}
-                                className={styles.removeButton}
-                                disabled={actionLoading || !selectedUserId}
-                            />
-                        </div>
+                        <select
+                            className={styles.dropdown}
+                            value={selectedUserId}
+                            onChange={(e) => setSelectedUserId(e.target.value)}
+                            disabled={actionLoading || !currentEventId || guestOptions.length === 0}
+                        >
+                            <option value="">Select Guest</option>
+                            {guestOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                        <PrimaryButton
+                            text={actionLoading ? 'Removing...' : 'Remove'}
+                            onClick={handleRemoveGuest}
+                            disabled={actionLoading || !selectedUserId}
+                        />
                     </section>
                 )}
 
+                {/* Notification */}
                 <Notification
                     message={notification.message}
                     isVisible={notification.isVisible}

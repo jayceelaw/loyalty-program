@@ -150,6 +150,8 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
 }
 
 .header {
@@ -198,8 +200,8 @@
 }
 
 .input:focus {
-  border-color: #1abc9c;
-  box-shadow: 0 0 4px rgba(26, 188, 156, 0.3);
+  border-color: #000000;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
 .dropdown { 
@@ -246,6 +248,8 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
 }
 
 .awardPointsWrapper h1 {
