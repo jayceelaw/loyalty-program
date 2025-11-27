@@ -9,23 +9,23 @@ import { useAuth } from '@/context/AuthContext';
 export default function TransactionsListPage() {
 
   const PAGELIMIT = 5;
-  const { user } = useAuth();
+  const { currentInterface } = useAuth();
   const [ transactions, setTransactions ] = useState([]);
   const [ filter, setFilter ] = useState({});
   const [ showAll, setShowAll ] = useState(false);
   const [ page, setPage ] = useState(1);
   const [ end, setEnd ] = useState(false);
-  const [ loading, setLoading ] = useState(false);
+  const [ loading, setLoading ] = useState(true);
   const [ errorMessage, setErrorMessage ] = useState('');
   const [ error, setError ] = useState(false);
   const scrollRef = useRef();
   const backendURL = 'http://localhost:4000';
 
   useEffect(() => {
-    if (user) {
-      setShowAll(user.role === 'manager' || user.role === 'superuser');
+    if (currentInterface) {
+      setShowAll(currentInterface === 'manager' || currentInterface === 'superuser');
     }
-  }, [user]);
+  }, [currentInterface]);
 
   const loadRegular = async () => {
     const url = new URL(backendURL + '/users/me/transactions');
@@ -152,12 +152,12 @@ export default function TransactionsListPage() {
       <h1>My Transactions</h1>
         <p className={'error ' + (error ? '' : styles.hidden)}>{errorMessage}</p>
         <TransactionFilter setFilter={setFilter} showAll={showAll}/>
-        <div ref={scrollRef} onScroll={handleScroll} className={styles.infiniteScroll}>
+       {!loading ? <div ref={scrollRef} onScroll={handleScroll} className={styles.infiniteScroll}>
           {transactions.map((t, index) => {
             return <TransactionCard key={index} {...t} showAll={showAll}/>
           })}
           <p>No more transactions.</p>
-        </div>
+        </div> : <div className='spinner'></div>}
     </div>
   );
 
