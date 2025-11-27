@@ -3,8 +3,10 @@ import { transfer } from "@/lib/transactions";
 import { PrimaryButton } from "@/app/components/Button";
 import { useState } from "react";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
+import { useAuth } from "@/context/AuthContext";
 export default function Purchase() {
 
+    const { token } = useAuth();
     const [ utorid, setUtorid ] = useState("");
     const [ spent, setSpent ] = useState("");
     const [ promotions, setPromotions ] = useState("");
@@ -38,7 +40,7 @@ export default function Purchase() {
         }));       
 
         fetch(`/transactions`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}`,
+            headers: { 'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'},
             method: "POST",
             body: JSON.stringify(relevantOptions)
