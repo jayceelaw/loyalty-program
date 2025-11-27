@@ -79,11 +79,15 @@ import styles from './TransactionCard.module.css'
 
      return (
 
-      <div className={styles.container}>
+      <div className={styles.container + ' ' + (showAll ? styles.hoverable : '')} onClick={() => {
+                if (!showAll) return;
+                localStorage.setItem("transactionID", id);
+                router.push('transaction/adjust');
+                }}>
         {/* header */}
         <div className={styles.header}>
           <p className={styles.id}>ID{id}</p>
-          <p className={showAll ? '' : styles.hidden}>{utorid}</p>
+          {showAll && <p>{utorid}</p>}
           <div className={styles.typeContent}>
             {getHeader()}
           </div>
@@ -100,11 +104,6 @@ import styles from './TransactionCard.module.css'
                 localStorage.setItem("transactionID", id);
                 router.push('transaction/redeemQr');
                 }}/></div>
-             <BackButton className={(showAll && !hideAdjust) ? '' : styles.hidden} text="Adjust"
-              onClick={() => {
-                localStorage.setItem("transactionID", id);
-                router.push('transaction/adjust');
-                }}/> 
           </div>
         </div>
         {/* promotions */}
@@ -117,8 +116,7 @@ import styles from './TransactionCard.module.css'
         {/* footer */}
           <div className={styles.footer}>
             <p className={styles.creator}>Created by {createdBy}</p>
-            <p className={styles.suspicious + ' ' + 
-                        (showAll ? '' : styles.hidden)}>{suspicious ? 'Suspicious' : ''}</p>
+            {showAll && <p className={styles.suspicious}>{suspicious ? 'Suspicious' : ''}</p>}
           </div>
       </div>
       
