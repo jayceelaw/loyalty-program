@@ -4,10 +4,13 @@ import { useState } from "react";
 import PointsBalance from "@/app/components/PointsBalance";
 import { useAuth } from "@/context/AuthContext";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
+import { useSearchParams } from "next/navigation";
 export default function Transfer() {
 
-    const { loadUser } = useAuth();
-    const [ recipientID, setRecipientID ] = useState("");
+    const searchParams = useSearchParams();
+    const defaultRecipient = searchParams.get("utorid");
+    const { loadUser, token } = useAuth();
+    const [ recipientID, setRecipientID ] = useState(defaultRecipient);
     const [ amount, setAmount ] = useState("");
     const [ remark, setRemark ] = useState("");
     const [ message, setMessage ] = useState("");
@@ -28,7 +31,7 @@ export default function Transfer() {
         }
 
         fetch(`/users/${recipientID}/transactions`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}`,
+            headers: { 'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'},
             method: "POST",
             body: JSON.stringify({ 
