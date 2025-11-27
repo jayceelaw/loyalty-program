@@ -149,7 +149,7 @@ async function main() {
 	},
 	{
 		id: 12,
-		utorid: 'tester1',
+		utorid: 'admin123',
 		name: 'Sarah Jones',
 		password: 'abc123',
 		email: 'superuser@utoronto.ca',
