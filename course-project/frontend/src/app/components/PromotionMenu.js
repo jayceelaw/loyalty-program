@@ -1,10 +1,12 @@
 'use client';
 
-import PrimaryActionDropDownButton from "./PrimaryActionDropDownButton";
+// import PrimaryActionDropDownButton from "./PrimaryActionDropDownButton";
+import NavDropDownButton from "./NavDropDownButton";
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-export default function PromotionMenu() {
+export default function PromotionMenu({ className = '' }) {
   const router = useRouter();
   const { currentInterface } = useAuth();
 
@@ -19,5 +21,10 @@ export default function PromotionMenu() {
     return;
   }
 
-  return <PrimaryActionDropDownButton options={menuOptions} />;
+  return (
+        <div className={className}>
+            <Link href="/promotion"></Link>
+            <NavDropDownButton options={menuOptions}/>
+        </div>
+    );
 }

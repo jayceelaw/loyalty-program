@@ -2,11 +2,13 @@
 'use client';
 import TagSelect from "./TagSelect";
 import colors from "../constants/colors";
-import PrimaryActionDropDownButton from "./PrimaryActionDropDownButton";
+// import PrimaryActionDropDownButton from "./PrimaryActionDropDownButton";
+import NavDropDownButton from "./NavDropDownButton";
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-  export default function TransactionMenu() {
+  export default function TransactionMenu({ className = '' }) {
     const router = useRouter();
     const { currentInterface } = useAuth();
 
@@ -20,7 +22,10 @@ import { useAuth } from '../../context/AuthContext.jsx';
     }
 
     return (
-        <PrimaryActionDropDownButton options={menuOptions}/>
+        <div className={className}>
+            <Link href="/transaction"></Link>
+            <NavDropDownButton options={menuOptions}/>
+        </div>
     );
 
     // get user role from the user context and add options accordingly
