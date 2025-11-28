@@ -9,7 +9,7 @@ import { PromotionChart } from "@/app/components/PromotionChart";
 import { UserPieChart } from "../../components/UserPieChart";
 import styles from '../user.module.css';
 
-const backendURL = "http://localhost:4000";
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 function getEventsPerMonth(events) {
   const sixMonthsAgo = new Date();

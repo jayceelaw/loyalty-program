@@ -1,9 +1,10 @@
 'use client';
 import QRCode from "react-qr-code";
 import { useAuth } from "@/context/AuthContext";
-const FRONTEND_URL = 'http:localhost:3000';
+import { usePathname } from 'next/navigation';
 
 export default function UserQR() {
+    const FRONTEND_URL = usePathname() || 'http:localhost:3000';
     const { user } = useAuth();
 
     return (

@@ -13,7 +13,7 @@ export default function RsvpPage() {
     const [eventId, setEventId] = useState('');
     const [loading, setLoading] = useState(false);
     const [isRsvped, setIsRsvped] = useState(false);
-    const backendURL = 'http://localhost:4000';
+    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
     const [notification, setNotification] = useState({ isVisible: false, message: '', type: 'success' });
     const showNotification = (message, type) => setNotification({ isVisible: true, message, type });

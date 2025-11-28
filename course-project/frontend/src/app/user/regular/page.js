@@ -5,7 +5,7 @@ import TransactionCard from "../../components/TransactionCard";
 import { UserLineChart } from "../../components/UserLineChart";
 import styles from '../user.module.css';
 
-const backendURL = "http://localhost:4000";
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function RegularUserPage() {
   const { user } = useAuth();

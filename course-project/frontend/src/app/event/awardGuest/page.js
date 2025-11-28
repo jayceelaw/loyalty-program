@@ -19,7 +19,7 @@ export default function AwardGuestPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const backendURL = 'http://localhost:4000';
+    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
     const [notification, setNotification] = useState({ isVisible: false, message: '', type: 'success' });
     const showNotification = (message, type) => setNotification({ isVisible: true, message, type });

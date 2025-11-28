@@ -14,7 +14,7 @@ export default function EventDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isUserRsvped, setIsUserRsvped] = useState(false);
-    const backendURL = 'http://localhost:4000';
+    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
     const id = typeof window !== 'undefined' ? localStorage.getItem('eventId') : null;
 
     // User can't see the list of guests so we have to store key in local browser, not sure

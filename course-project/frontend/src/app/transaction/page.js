@@ -19,7 +19,7 @@ export default function TransactionsListPage() {
   const [ errorMessage, setErrorMessage ] = useState('');
   const [ error, setError ] = useState(false);
   const scrollRef = useRef();
-  const backendURL = 'http://localhost:4000';
+  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
   useEffect(() => {
     if (currentInterface) {
