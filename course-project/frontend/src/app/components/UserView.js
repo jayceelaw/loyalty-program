@@ -392,9 +392,11 @@ export default function UserView() {
                                     </div>
 
                                     <div className={styles.userActions}>
-                                        <Button type="button" variant="secondary" className={styles.showMoreBtn} onClick={() => openEditor(u)}>
-                                            {expandedUserId === u.id ? 'Close' : 'Edit User Info'}
-                                        </Button>
+                                        {!(expandedUserId === u.id && window.innerWidth < 720) && (
+                                            <Button type="button" variant="secondary" className={styles.showMoreBtn} onClick={() => openEditor(u)}>
+                                                {expandedUserId === u.id ? 'Close' : 'Edit User Info'}
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             );

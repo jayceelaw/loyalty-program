@@ -163,7 +163,7 @@ async function main() {
 		utorid: 'email12',
 		name: 'Email Tester',
 		password: 'oldpassword',
-		email: 'jaycee.law@mail.utoronto.ca',
+		email: 'real.email@mail.utoronto.ca',
 		role: 'regular',
 		verified: false,
 		activated: true,
