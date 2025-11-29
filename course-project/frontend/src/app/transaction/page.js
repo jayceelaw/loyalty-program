@@ -12,7 +12,7 @@ export default function TransactionsListPage() {
   const { token, currentInterface } = useAuth();
   const [ transactions, setTransactions ] = useState([]);
   // const [ filter, setFilter ] = useState({});
-  const [ showAll, setShowAll ] = useState(false);
+  const [ showAll, setShowAll ] = useState(null);
   const [ page, setPage ] = useState(1);
   const [ end, setEnd ] = useState(false);
   const [ loading, setLoading ] = useState(true);
@@ -119,8 +119,8 @@ export default function TransactionsListPage() {
   }
 
   const load = (specificPage) => {
-    if (!token) return;
-    filter.page = specificPage === 1 ? 1 : page;
+    if (!token || showAll === null) return;
+    filter.page = specificPage === 1 ? specificPage : page;
     filter.limit = PAGELIMIT;
 
     let data;
@@ -138,7 +138,7 @@ export default function TransactionsListPage() {
   // apply filter
   useEffect(()=>{
     setTransactions([]);
-    setPage(0);
+    setPage(1);
     load(1);
     setEnd(false);
     setError(false);
@@ -148,7 +148,7 @@ export default function TransactionsListPage() {
       scrollRef.current.scrollTop = 0;
     }
 
-  }, [searchParams, showAll]);
+  }, [searchParams, showAll, token]);
 
   const handleScroll = (e) => {
     const bottomReached = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
