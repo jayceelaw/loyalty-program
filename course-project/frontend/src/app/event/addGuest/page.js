@@ -7,11 +7,11 @@ import { PrimaryButton } from '../../components/Button';
 import Notification from '../../components/Notification';
 import styles from '../event.module.css';
 
-export default function AddGuestsPage() { 
+export default function AddGuestsPage() {
     const searchParams = useSearchParams()
     const { user, token } = useAuth();
     const initialEventId = searchParams.get('eventId') || '';
-    const [currentEventId, setCurrentEventId] = useState(initialEventId); 
+    const [currentEventId, setCurrentEventId] = useState(initialEventId);
     const [event, setEvent] = useState(null);
     const [selectedUserId, setSelectedUserId] = useState('');
     const [newGuestUtorid, setNewGuestUtorid] = useState('');
@@ -24,49 +24,45 @@ export default function AddGuestsPage() {
     const showNotification = (message, type = 'success') => setNotification({ isVisible: true, message, type });
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
-    // Fetch Event
-    const fetchEvent = async (eventId) => {
-        if (!eventId) return;
-        setLoading(true);
-        setError('');
-
-        try {
-            const res = await fetch(`${backendURL}/events/${eventId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) {
-                const { error } = await res.json();
-                setEvent(null);
-                throw new Error(error || 'Failed to fetch event');
-            }
-            const data = await res.json();
-            setEvent(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (currentEventId && user) {
-            fetchEvent(currentEventId);
-        } else {
-            setLoading(false); 
+        if (!currentEventId) {
+            setLoading(false);
             setEvent(null);
             setError('');
+            return;
         }
-    }, [currentEventId, user]);
+        // Fetch Event
+        const fetchEvent = async () => {
+            setLoading(true);
+            setError('');
+            try {
+                const res = await fetch(`${backendURL}/events/${currentEventId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) {
+                    const { error } = await res.json();
+                    setEvent(null);
+                    throw new Error(error || 'Failed to fetch event');
+                }
+                const data = await res.json();
+                setEvent(data);
+            } catch (err) {
+                setError(err.message); // save err message so it can be rendered later
+                showNotification(err.message, 'error');
+            } finally {
+                setLoading(false);
+            };
+        };
+
+        fetchEvent();
+    }, [currentEventId, token]); // run this when currentEventId changes 
 
     // role
     const isManagerOrSuperuser = ['manager', 'superuser'].includes(user?.role);
-    const canRemove = isManagerOrSuperuser;
 
     // add guests
     const handleAddGuest = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // prevent full page reload of browser (update UI without refreshing)
         if (!currentEventId) return showNotification('Please enter an Event ID first.', 'error');
         setActionLoading(true);
         try {
@@ -95,7 +91,7 @@ export default function AddGuestsPage() {
 
     // remove guest
     const handleRemoveGuest = async () => {
-        if (!selectedUserId || !canRemove || !currentEventId) return;
+        if (!selectedUserId || !isManagerOrSuperuser || !currentEventId) return;
         setActionLoading(true);
 
         try {
@@ -146,7 +142,7 @@ export default function AddGuestsPage() {
 
                 {/* Status based on eventId */}
                 {loading && currentEventId && <p>Loading event details...</p>}
-                {currentEventId && !loading && !event && (<p style={{ color: 'red' }}>Event not found.</p>)}
+                {currentEventId && !loading && !event && (<p className={styles.error}>{error}</p>)}
 
                 {/* Add guest */}
                 <section className={styles.formSection}>
@@ -157,20 +153,20 @@ export default function AddGuestsPage() {
                             placeholder="Enter UTORID"
                             value={newGuestUtorid}
                             onChange={(e) => setNewGuestUtorid(e.target.value)}
-                            disabled={actionLoading || !currentEventId}
+                            disabled={actionLoading || !currentEventId || !event}
                             required
                             className={styles.input}
                         />
                         <PrimaryButton
                             text={actionLoading ? 'Adding...' : 'Add'}
                             type="submit"
-                            disabled={!currentEventId || actionLoading || !newGuestUtorid}
+                            disabled={!currentEventId || !event || actionLoading || !newGuestUtorid}
                         />
                     </form>
                 </section>
 
                 {/* Remove guest */}
-                {canRemove && (
+                {isManagerOrSuperuser && (
                     <section className={styles.formSection}>
                         <h3>Remove Guest</h3>
                         <select

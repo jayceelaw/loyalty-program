@@ -12,6 +12,7 @@ export default function RsvpPage() {
     const [eventId, setEventId] = useState('');
     const [loading, setLoading] = useState(false);
     const [isRsvped, setIsRsvped] = useState(false);
+    const [error, setError] = useState('');
     const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
     const [notification, setNotification] = useState({ isVisible: false, message: '', type: 'success' });
@@ -35,7 +36,7 @@ export default function RsvpPage() {
                 setIsRsvped(false); 
             }
         } catch (err) {
-            console.error('Error checking RSVP status:', err); 
+            console.error('Error checking RSVP status:', err); // user doesn't have to see
             setIsRsvped(false); 
         }
     };
@@ -47,9 +48,9 @@ export default function RsvpPage() {
         } else {
             setIsRsvped(false)
         }
-    }, [eventId]);
+    }, [eventId, token]);
 
-    // RSVP Function
+    // RSVP Function 
     const handleRSVP = async () => {
         if (isRsvped) return; 
 
@@ -68,10 +69,11 @@ export default function RsvpPage() {
             const data = await res.json();
 
             if (res.ok) { 
-                // localStorage.setItem(rsvpKey, 'true');
                 setIsRsvped(true); 
+                setError('');
                 showNotification(`RSVP successful for event ID: ${eventId}!`, 'success'); 
             } else {
+                setError(data.error || 'Event not found.');
                 showNotification(`RSVP failed. Error: ${data.error || 'Event not found or inaccessible.'}`, 'error');
             }
         } catch (err) {
@@ -97,13 +99,17 @@ export default function RsvpPage() {
                         id="eventid"
                         type="text"
                         value={eventId}
-                        onChange={(e) => setEventId(e.target.value)}
+                        onChange={(e) => {
+                            setEventId(e.target.value);
+                            setError('');
+                        }}
                         className={styles.awardInputField}
                         placeholder="Enter Event ID"
                     />
                 </div>
 
                 {/* RSVP Button */}
+                {error && <p className={styles.error}>{error}</p>}
                 <PrimaryButton
                     text={rsvpButtonText}
                     onClick={handleRSVP}

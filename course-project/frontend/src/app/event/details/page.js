@@ -12,7 +12,6 @@ export default function EventDetailPage() {
     const { user, token } = useAuth();
     const searchParams = useSearchParams();
     const id = searchParams.get('eventId');
-
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -68,8 +67,8 @@ export default function EventDetailPage() {
         setLoading(true); 
         fetchEvent();
         checkRsvpStatus();
-    }, [id, user?.id, token]); // Rerun if event or user or token changes  
-
+    }, [id, token]); // Rerun if eventid or token changes
+    
     // RSVP  
     const handleRSVP = async () => {
         try {
