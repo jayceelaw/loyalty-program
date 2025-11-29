@@ -211,11 +211,12 @@ router.get('/', jwtAuth, async (req, res) => {
 
 // get single promotion
 router.get('/:promotionId', jwtAuth, async (req, res) => {
+    // get promotion id
     const id = Number(req.params.promotionId);
     if (!Number.isInteger(id)) return res.status(404).json({ error: "invalid promotion id" });
 
     const p = await prisma.promotion.findUnique({ where: { id } });
-    if (!p) return res.status(404).json({ error: "not found" });
+    if (!p) return res.status(404).json({ error: "promotion not found" });
 
     const now = new Date();
 
@@ -234,7 +235,7 @@ router.get('/:promotionId', jwtAuth, async (req, res) => {
     } else {
         // regular user: promotion must be active and not used
         const active = p.startTime <= now && p.endTime > now;
-        if (!active) return res.status(404).json({ error: "not found" });
+        if (!active) return res.status(404).json({ error: "Promotion not found (not active)" });
 
         return res.json({
             id: p.id,
@@ -260,7 +261,7 @@ router.patch('/:promotionId', jwtAuth, async (req, res) => {
     if (!Number.isInteger(id)) return res.status(404).json({ error: "invalid promotion id" });
 
     const existing = await prisma.promotion.findUnique({ where: { id } });
-    if (!existing) return res.status(404).json({ error: "not found" });
+    if (!existing) return res.status(404).json({ error: "promotion id does not exist" });
 
     const now = new Date();
 
@@ -272,18 +273,18 @@ router.patch('/:promotionId', jwtAuth, async (req, res) => {
     const endPassedAlready = existing.endTime <= now;
 
     if (name !== undefined && name !==null) {
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (!name || typeof name !== 'string') return res.status(400).json({ error: "invalid payload" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (!name || typeof name !== 'string') return res.status(400).json({ error: "Invalid name" });
         update.name = name;
     }
     if (description !== undefined && description !==null) {
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (!description || typeof description !== 'string') return res.status(400).json({ error: "invalid payload" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (!description || typeof description !== 'string') return res.status(400).json({ error: "invalid description" });
         update.description = description;
     }
     if (type !== undefined && type !==null) {
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (type !== 'automatic' && type !== 'one-time') return res.status(400).json({ error: "invalid payload" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (type !== 'automatic' && type !== 'one-time') return res.status(400).json({ error: "invalid type" });
         if (type === 'one-time') {
             type = 'onetime';
         }
@@ -291,35 +292,36 @@ router.patch('/:promotionId', jwtAuth, async (req, res) => {
     }
     if (startTime !== undefined && startTime !==null) {
         const s = isoToDate(startTime);
-        if (!s) return res.status(400).json({ error: "invalid payload" });
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (s < now) return res.status(400).json({ error: "invalid payload" });
+        if (!s) return res.status(400).json({ error: "invalid start time" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (s < now) return res.status(400).json({ error: "Cannot edit start time to be in the past" });
         update.startTime = s;
     }
     if (endTime !== undefined && endTime !==null) {
         const e = isoToDate(endTime);
         if (!e) return res.status(400).json({ error: "invalid payload" });
-        if (endPassedAlready) return res.status(400).json({ error: "invalid payload" });
+        if (endPassedAlready) return res.status(400).json({ error: "Cannot edit, event already finished" });
         const refStart = update.startTime || existing.startTime;
-        if (e <= refStart) return res.status(400).json({ error: "invalid payload" });
+        if (e <= refStart) return res.status(400).json({ error: "Cannot edit end time to be before start time" });
         update.endTime = e;
     }
     if (minSpending !== undefined && minSpending !==null) {
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (!isPositiveNumber(minSpending)) return res.status(400).json({ error: "invalid payload" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (!isPositiveNumber(minSpending)) return res.status(400).json({ error: "invalid min spending" });
         update.minSpending = minSpending;
     }
     if (rate !== undefined && rate !==null) {
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (!isPositiveNumber(rate)) return res.status(400).json({ error: "invalid payload" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (!isPositiveNumber(rate)) return res.status(400).json({ error: "invalid rate" });
         update.rate = rate;
     }
     if (points !== undefined && points !==null) {
-        if (startedAlready) return res.status(400).json({ error: "invalid payload" });
-        if (!isPositiveInteger(points)) return res.status(400).json({ error: "invalid payload" });
+        if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
+        if (!isPositiveInteger(points)) return res.status(400).json({ error: "invalid points" });
         update.points = points;
     }
 
+    // if nothing to update, just return basic promotion info
     if (Object.keys(update).length === 0) {
         return res.json({ id: existing.id, name: existing.name, type: existing.type });
     }
@@ -329,6 +331,7 @@ router.patch('/:promotionId', jwtAuth, async (req, res) => {
         data: update
     });
 
+    // only return fields that have changed
     const response = { id: updated.id, name: updated.name, type: updated.type };
     for (const k of Object.keys(update)) response[k] = updated[k];
     return res.json(response);
@@ -343,11 +346,11 @@ router.delete('/:promotionId', jwtAuth, async (req, res) => {
     if (!Number.isInteger(id)) return res.status(404).json({ error: "invalid promotion id" });
 
     const p = await prisma.promotion.findUnique({ where: { id } });
-    if (!p) return res.status(404).json({ error: "not found" });
+    if (!p) return res.status(404).json({ error: "promotion not found" });
 
     const now = new Date();
     if (p.startTime <= now) {
-        return res.status(403).json({ error: "not permitted" });
+        return res.status(403).json({ error: "not permitted, start time in the past" });
     }
 
     await prisma.promotion.delete({ where: { id } });
