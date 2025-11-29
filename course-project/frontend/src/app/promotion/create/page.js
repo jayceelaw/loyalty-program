@@ -148,7 +148,6 @@ export default function CreatePromotion() {
             </div>
 
             <div className={styles.footer}>
-                <FeedBackMessage error={error} message={message}/>
                 <PrimaryButton
                     className="submit"
                     text="Create"
@@ -157,7 +156,7 @@ export default function CreatePromotion() {
                         handleSend();
                     }}
                 />
-   
+                <FeedBackMessage error={error} message={message}/>
             </div>
         </div>
     );
