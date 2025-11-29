@@ -16,7 +16,7 @@ import styles from './TransactionCard.module.css'
         spent,
         processed,
         relatedId, // redemption or adjustment
-        eventId,
+        event,
         sender,
         recipient,
         suspicious,
@@ -26,7 +26,7 @@ import styles from './TransactionCard.module.css'
       }) {
 
       const router = useRouter();
-      const promotions = promotionIds ? ['sample promotion', 'another promotion'] : [];
+      const promotions = promotionIds ? promotionIds.map(p => p.name) : [];
 
       // returns the section to display based on related data to each type
       function getHeader() {
@@ -52,7 +52,7 @@ import styles from './TransactionCard.module.css'
             );
           case 'event':
             return (
-                <p><span className={styles.label}>Event ID: </span>{eventId}</p>
+                <p className={styles.eventName}>{event?.name}</p>
             );
           default:
             return;
@@ -63,7 +63,7 @@ import styles from './TransactionCard.module.css'
     function getTypeStyle() {
        switch (type) {
           case 'purchase':
-            return styles.purchase;
+            return styles.purchase + ' ' + styles.tagButton;
           case 'transfer':
             return styles.transfer;
           case 'redemption':
@@ -77,12 +77,16 @@ import styles from './TransactionCard.module.css'
         }
     }
 
+    function capitalize(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
      return (
 
-      <div className={styles.container + ' ' + (showAll ? styles.hoverable : '')} onClick={() => {
-                if (!showAll) return;
-                localStorage.setItem("transactionID", id);
-                router.push('transaction/adjust');
+      <div className={styles.container + ' ' + (showAll && !hideAdjust ? styles.hoverable : '')} onClick={() => {
+                if (!showAll || hideAdjust) return;
+                  router.push(`/transaction/adjust?transactionId=${id}`);
                 }}>
         {/* header */}
         <div className={styles.header}>
@@ -94,16 +98,18 @@ import styles from './TransactionCard.module.css'
         </div>
         {/* main content */}
         <div className={styles.center}>
-          <div className={styles.type + ' ' + getTypeStyle()}>{type}</div>
+          <div className={styles.type + ' ' + getTypeStyle()}>{capitalize(type)}</div>
           <p className={styles.amount + ' ' + (amount < 0 ? styles.negative : styles.positive)}>
             {(amount > 0 ? '+' : '') + amount}
           </p>
-          <div className={styles.buttons}>  {/* TODO: pass transaction id to adjust in context */}
+          <div className={styles.buttons}> 
              <div className={type === 'redemption' ? styles.qr : styles.hidden}>
-              <PrimaryButton  text="Scan QR" onClick={()=> {
-                localStorage.setItem("transactionID", id);
-                router.push('transaction/redeemQr');
-                }}/></div>
+              <button className={styles.scan} onClick={(e)=> {
+                  e.stopPropagation(); // prevent clicking to adjust transaction
+                  router.push(`/transaction/redeemQr?transactionId=${id}`);
+                }}>Scan QR
+              </button>
+           </div>
           </div>
         </div>
         {/* promotions */}
@@ -119,9 +125,6 @@ import styles from './TransactionCard.module.css'
             {showAll && <p className={styles.suspicious}>{suspicious ? 'Suspicious' : ''}</p>}
           </div>
       </div>
-      
-      
     );
-    
   }
     

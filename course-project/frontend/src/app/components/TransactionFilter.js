@@ -2,11 +2,13 @@
 import TagSelect from './TagSelect';
 import styles from './TransactionFilter.module.css';
 import colors from '../constants/colors';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { PrimaryButton } from './Button';
+import { useRouter } from 'next/navigation';
 
-export default function TransactionFilter({setFilter, showAll}) {
+export default function TransactionFilter({showAll}) {
 
+    const router = useRouter();
     const clearance = showAll ? '' : styles.hidden;
 
     const [ type, setType ] = useState('');
@@ -42,7 +44,7 @@ export default function TransactionFilter({setFilter, showAll}) {
         },
         {
           text: 'Event',
-          backgroundColour: colors.primaryGreen,
+          backgroundColour: colors.primaryBlueDark,
           action: () => setType('event'),
         },
         {
@@ -84,7 +86,7 @@ export default function TransactionFilter({setFilter, showAll}) {
     ];
     
     const applyFilter = () => {
-      setFilter({
+      const filters = {
         type: type,
         id: id,
         amount: amount, 
@@ -94,7 +96,18 @@ export default function TransactionFilter({setFilter, showAll}) {
         utorid: owner, 
         createdBy: creator, 
         suspicious: suspicious
+      };
+
+      const params = new URLSearchParams();
+
+      // clean filters
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== "" && value !== null && value !== undefined) {
+          params.set(key, value);
+        }
       });
+
+    router.replace(`?${params.toString()}`);
     };
 
     const clearFilters = () => {
@@ -141,14 +154,14 @@ export default function TransactionFilter({setFilter, showAll}) {
                 onChange={e=>(setRelatedID(e.target.value))}></input>
 
             {/* Manager only options depending on showAll*/}
-            <label className={styles.label  + ' ' + clearance}>utorid: </label>
+            <label className={styles.label  + ' ' + clearance}>UTORid: </label>
             <input className={styles.name + ' ' + clearance} type='text' value={owner}
                 onChange={e=>(setOwner(e.target.value))}></input>
-            <label className={styles.label + ' ' + clearance}>creator: </label>
+            <label className={styles.label + ' ' + clearance}>Creator: </label>
             <input className={styles.name + ' ' + clearance} type='text' value={creator}
                 onChange={e=>(setCreator(e.target.value))}></input>
             <PrimaryButton text="Filter" onClick={applyFilter}/>
-            <PrimaryButton text="Clear" onClick={clearFilters} />
+            <button className={styles.clear} onClick={clearFilters} >Clear</button>
         </div>
     );
 }

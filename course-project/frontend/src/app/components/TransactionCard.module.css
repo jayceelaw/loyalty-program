@@ -11,7 +11,7 @@
 }
 
 .hoverable:hover  {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
@@ -57,10 +57,19 @@
 
 .type {
     border-radius: 50px;
-    width: 80px;
+    width: 90px;
     margin-left: 4px;
     margin-right: 16px;
+    align-items: center;
     text-align: center;
+    color: white;
+    padding: 4px 8px;
+    border: 2px solid var(--color-light-gray);
+    cursor: pointer;
+    font-family: 'Neue Montreal', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    
 }
 
 .amount {
@@ -92,26 +101,37 @@
     display: flex;
     flex-direction: row;
     justify-content: end;
-    width: 100% - 84px;
+    width: 100% - 112px;
     margin-top: 4px;
-    margin-left: 100px;
+    margin-left: 112px;
     margin-right: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
     gap: 16px;
+    font-family: 'Neue Montreal', sans-serif;
 }
 
 .promotion {
-    background-color: var(--color-primary-pink);
-    border-radius: 50px;
+    border: 2px outset var(--color-primary-pink);
+    border-radius: 12px;
     padding: 4px;
     width: auto;
-    font-size: 10px;
+    font-size: 12px;
     margin-bottom: 2px;
+    text-align: center;
+    
 }
 
 .remark {
-    margin-left: 100px;
-    font-size: 12px;
-    color: gray;
+    margin-left: 112px;
+    font-size: 13px;
+    font-weight: 500;            /* semi-bold for emphasis */
+    color: #333;                 /* dark text for readability */
+    text-transform: capitalize;  /* capitalizes first letter of each word */
+    white-space: normal;         /* allows wrapping */
+    word-break: break-word;      /* prevents overflow on long words */
+    max-width: calc(100% - 100px);            /* optional width limit */
 }
 
 .footer {
@@ -132,26 +152,43 @@
 }
 
 .purchase {
-    background-color: var(--color-primary-orange);
+    background-color: #d18544;
     border-radius: 10px;
 }
 
 .transfer {
-    background-color: var(--color-primary-yellow);
+    background-color: #c89e56;
     border-radius: 10px;
 }
 
 .redemption {
-    background-color: var(--color-primary-purple);
+    background-color: #9676b3;
     border-radius: 10px;
 }
 
 .event {
-    background-color: var(--color-primary-green);
+    background-color: #487ca5;
     border-radius: 10px;
 }
 
 .adjustment {
-    background-color: var(--color-primary-orange);
+    background-color: #ca665f;
     border-radius: 10px;
+}
+
+.eventName {
+    font-weight: bold;
+}
+
+.scan {
+    padding: 8px;
+    border: 2px solid black;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.scan:hover {
+    border-color: #555;
+    color: #555;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
