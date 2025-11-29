@@ -8,7 +8,7 @@ import { PrimaryButton } from "@/app/components/Button";
 export default function Redeem() {
 
     const router = useRouter();
-    const { token, initializing } = useAuth();
+    const { user, initializing } = useAuth();
 
     const [ amount, setAmount ] = useState("");
     const [ remark, setRemark ] = useState("");
@@ -17,7 +17,7 @@ export default function Redeem() {
     const [ loading, setLoading ] = useState(false);
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing])

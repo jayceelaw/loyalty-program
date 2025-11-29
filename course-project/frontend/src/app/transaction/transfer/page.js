@@ -10,7 +10,7 @@ export default function Transfer() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const defaultRecipient = searchParams.get("utorid") || '';
-    const { loadUser, token, initializing } = useAuth();
+    const { loadUser, user, initializing } = useAuth();
     const [ recipientID, setRecipientID ] = useState(defaultRecipient);
     const [ amount, setAmount ] = useState("");
     const [ remark, setRemark ] = useState("");
@@ -19,7 +19,7 @@ export default function Transfer() {
     const [ loading, setLoading ] = useState(false);
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing])

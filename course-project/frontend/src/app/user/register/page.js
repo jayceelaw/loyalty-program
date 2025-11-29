@@ -8,10 +8,10 @@ import { useEffect } from 'react';
 export default function RegisterPage() {
 
   const router = useRouter();
-  const { initializing, token, currentInterface } = useAuth();
+  const { initializing, user, currentInterface } = useAuth();
 
   useEffect(() => {
-      if (!initializing && !token) {
+      if (!initializing && !user) {
           router.replace('/login');
       }
   }, [initializing])

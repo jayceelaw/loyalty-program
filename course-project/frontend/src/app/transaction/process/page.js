@@ -12,14 +12,14 @@ export default function Process() {
     const { notify } = useNotification();
     const searchParams = useSearchParams();
     const defaultTransactionID = searchParams.get("transactionId") || "";
-    const { user, loadUser, token, currentInterface, initializing } = useAuth();
+    const { user, loadUser, currentInterface, initializing } = useAuth();
     const [ transactionID, setTransactionID ] = useState(defaultTransactionID);
     const [ message, setMessage ] = useState("");
     const [ error, setError ] = useState(false);
     const [ loading, setLoading ] = useState(false);
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing])

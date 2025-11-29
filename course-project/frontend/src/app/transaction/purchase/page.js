@@ -9,7 +9,7 @@ export default function Purchase() {
 
     const router = useRouter();
     const { notify } = useNotification();
-    const { token, currentInterface, user, loadUser, initializing } = useAuth();
+    const { currentInterface, user, loadUser, initializing } = useAuth();
     const [ utorid, setUtorid ] = useState("");
     const [ spent, setSpent ] = useState("");
     const [ promotions, setPromotions ] = useState("");
@@ -19,7 +19,7 @@ export default function Purchase() {
     const [ loading, setLoading ] = useState(false);
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing])

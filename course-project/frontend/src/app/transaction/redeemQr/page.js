@@ -9,11 +9,11 @@ export default function RedeemQR() {
   const FRONTEND_URL = usePathname() || 'http:localhost:3000';
   const searchParams = useSearchParams();
   const transactionId = searchParams.get("transactionId");
-  const { initializing, token } = useAuth();
+  const { initializing, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-      if (!initializing && !token) {
+      if (!initializing && !user) {
           router.replace('/login');
       }
   }, [initializing])

@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export default function TransactionsListPage() {
 
   const PAGELIMIT = 5;
-  const { token, currentInterface, initializing} = useAuth();
+  const { user, currentInterface, initializing} = useAuth();
   const router = useRouter();
   const scrollRef = useRef();
   const searchParams = useSearchParams();
@@ -25,7 +25,7 @@ export default function TransactionsListPage() {
   const [ error, setError ] = useState(false);
  
   useEffect(() => {
-      if (!initializing && !token) {
+      if (!initializing && !user) {
         router.replace('/login');
       }
   }, [initializing])
@@ -128,7 +128,7 @@ export default function TransactionsListPage() {
   }
 
   const load = (specificPage) => {
-    if (!token || showAll === null) return;
+    if (!user || showAll === null) return;
     filter.page = specificPage === 1 ? specificPage : page;
     filter.limit = PAGELIMIT;
 
@@ -157,7 +157,7 @@ export default function TransactionsListPage() {
       scrollRef.current.scrollTop = 0;
     }
 
-  }, [searchParams, showAll, token]);
+  }, [searchParams, showAll, user]);
 
   const handleScroll = (e) => {
     const bottomReached = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;

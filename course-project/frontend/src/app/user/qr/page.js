@@ -6,11 +6,11 @@ import { useEffect } from "react";
 
 export default function UserQR() {
     const FRONTEND_URL = usePathname() || 'http:localhost:3000';
-    const { user, initializing, token } = useAuth();
+    const { user, initializing } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing])

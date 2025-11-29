@@ -7,10 +7,10 @@ import { useEffect } from 'react';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { initializing, token } = useAuth();
+  const { initializing, user } = useAuth();
 
   useEffect(() => {
-      if (!initializing && !token) {
+      if (!initializing && !user) {
           router.replace('/login');
       }
   }, [initializing])
