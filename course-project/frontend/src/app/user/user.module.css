@@ -324,14 +324,7 @@
   color: var(--muted-text);
 }
 
-@media (max-width: 720px) {
-  .form {
-    grid-template-columns: 1fr;
-  }
-  .card {
-    padding: 18px;
-  }
-}
+
 
 .roleFilterGroup {
   display: flex;
@@ -585,4 +578,45 @@
     padding-top: 16px;
     display: flex;
     justify-content: center;
+}
+
+@media (max-width: 720px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 18px;
+    width: 90%;
+  }
+
+  .pageContainer {
+    width: 85%;
+  }
+
+  .userMeta {
+    width: 140%;
+  }
+
+  .userActions {
+    grid-row-start: 2;
+    grid-column-start: 2;
+    margin-top: 0;
+  }
+
+  .userCard {
+    padding-top: 2.2rem;
+  }
+
+  .expandedEditor {
+    height: fit-content;
+  }
+
+  .editorGrid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .editorActions {
+    margin-top: 2rem;
+  }
 }

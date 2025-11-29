@@ -1,15 +1,12 @@
 'use client';
 import QRCode from "react-qr-code";
-import { BackButton, PrimaryButton } from "@/app/components/Button";
-import { useRouter, useSearchParams } from "next/navigation";
-import styles from '@/app/transaction/transaction.module.css';
-const FRONTEND_URL = 'http:localhost:3000';
+import { useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function RedeemQR() {
-
+  const FRONTEND_URL = usePathname() || 'http:localhost:3000';
   const searchParams = useSearchParams();
   const transactionId = searchParams.get("transactionId");
-  const router = useRouter();
 
   return (
     <div className="main-container">

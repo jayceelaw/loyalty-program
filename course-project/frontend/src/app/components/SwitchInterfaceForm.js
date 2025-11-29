@@ -51,7 +51,6 @@ export default function SwitchInterfaceForm() {
 
 	const handleSubmit = () => {
 		setCurrentInterface(selected);
-		// localStorage.setItem('interface', selected);
 		setMessage({ type: 'success', text: `Switched to ${selected} interface` });
 	};
 

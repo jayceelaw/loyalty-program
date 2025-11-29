@@ -5,8 +5,6 @@ import TransactionFilter from '../components/TransactionFilter';
 import styles from '@/app/transaction/transaction.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
-import { requestAsyncStorage } from 'next/dist/client/components/request-async-storage-instance';
-
 
 export default function TransactionsListPage() {
 
@@ -21,9 +19,9 @@ export default function TransactionsListPage() {
   const [ errorMessage, setErrorMessage ] = useState('');
   const [ error, setError ] = useState(false);
   const scrollRef = useRef();
-  const backendURL = 'http://localhost:4000';
   const searchParams = useSearchParams();
   const filter = Object.fromEntries(searchParams.entries());
+  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
   useEffect(() => {
     if (currentInterface) {

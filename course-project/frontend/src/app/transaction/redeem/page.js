@@ -1,11 +1,10 @@
 'use client';
-import { BackButton, PrimaryButton } from "../../components/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import PointsBalance from "@/app/components/PointsBalance";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
-
+import { PrimaryButton } from "@/app/components/Button";
 export default function Redeem() {
 
     const router = useRouter();

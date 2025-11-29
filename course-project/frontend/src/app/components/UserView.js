@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../user/user.module.css';
 import Button from './Button';
 import PrimaryActionDropDownButton from './PrimaryActionDropDownButton';
@@ -13,23 +14,26 @@ export default function UserView() {
     const [verifiedFilter, setVerifiedFilter] = useState(null);
     const [activatedFilter, setActivatedFilter] = useState(null);
     const { token } = useAuth();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    
     let loading = false;
     let filter = false;
     const limit = 5;
     const roles = ['regular', 'cashier', 'manager', 'superuser'];
-    const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL; // idk why this is needed here
+    const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL;
 
     // new state for expansion and edit form
-    const [expandedUserId, setExpandedUserId] = useState(null);
+    const [userId, setUserId] = useState(null);
     const [editForm, setEditForm] = useState({
         email: '',
         verified: null,
         suspicious: null,
         role: '',
         message: '',
-        messageType: '' // 'success' or 'error'
+        messageType: ''
     });
-    const [initialEdit, setInitialEdit] = useState(null); // track original values to know if form is dirty
+    const [initialEdit, setInitialEdit] = useState(null);
 
     const fetchUsers = async (p = 1) => {
         if (loading) { // prevent fetching twice
@@ -75,30 +79,39 @@ export default function UserView() {
 
     // helper to open the editor for a user and prefill form
     const openEditor = (u) => {
-        // toggle editor
-        if (expandedUserId === u.id) {
-            setExpandedUserId(null);
-            setInitialEdit(null);
-            setEditForm(prev => ({ ...prev, message: '', messageType: '' }));
-            return;
+        const newExpandedId = userId === u.id ? null : u.id;
+        setUserId(newExpandedId);
+        
+        // update URL with userId query param
+        const params = new URLSearchParams(searchParams);
+        if (newExpandedId) {
+            params.set('userId', newExpandedId);
+        } else {
+            params.delete('userId');
         }
+        router.push(`?${params.toString()}`);
 
-        const initial = {
-            email: u.email ?? '',
-            verified: u.verified === true ? true : false,
-            suspicious: u.suspicious === true ? true : false,
-            role: u.role ?? 'regular'
-        };
-
-        setExpandedUserId(u.id);
-        setInitialEdit(initial);
-        setEditForm({ ...initial, message: '', messageType: '' });
+        if (newExpandedId) {
+            const initial = {
+                email: u.email ?? '',
+                verified: u.verified === true ? true : false,
+                suspicious: u.suspicious === true ? true : false,
+                role: u.role ?? 'regular'
+            };
+            setInitialEdit(initial);
+            setEditForm({ ...initial, message: '', messageType: '' });
+        }
     };
 
     const closeEditor = () => {
-        setExpandedUserId(null);
+        setUserId(null);
         setInitialEdit(null);
         setEditForm(prev => ({ ...prev, message: '', messageType: '' }));
+        
+        // remove userId from URL
+        const params = new URLSearchParams(searchParams);
+        params.delete('userId');
+        router.push(`?${params.toString()}`);
     };
 
     const handleEditChange = (field, value) => {
@@ -113,12 +126,6 @@ export default function UserView() {
             if (editForm.verified !== initialEdit.verified) payload.verified = editForm.verified;
             if (editForm.suspicious !== initialEdit.suspicious) payload.suspicious = editForm.suspicious;
             if (editForm.role !== initialEdit.role) payload.role = editForm.role;
-        } else {
-            // fallback: send what we have (shouldn't usually happen because submit is disabled when not dirty)
-            if (editForm.email !== undefined) payload.email = editForm.email;
-            if (editForm.verified !== undefined) payload.verified = editForm.verified;
-            if (editForm.suspicious !== undefined) payload.suspicious = editForm.suspicious;
-            if (editForm.role) payload.role = editForm.role;
         }
 
         // nothing changed -> no request
@@ -154,14 +161,50 @@ export default function UserView() {
         }
     };
 
+    // initialize filters and userId from URL on mount
+    useEffect(() => {
+        const roleParam = searchParams.get('role');
+        const verifiedParam = searchParams.get('verified');
+        const activatedParam = searchParams.get('activated');
+        const expandedParam = searchParams.get('userId');
+
+        setRoleFilter(roleParam || null);
+        setVerifiedFilter(verifiedParam || null);
+        setActivatedFilter(activatedParam || null);
+        setUserId(expandedParam ? parseInt(expandedParam) : null);
+
+        // if (expandedParam) {
+        //     const initial = { email: '', verified: null, suspicious: null, role: '' };
+        //     setInitialEdit(initial);
+        // }
+    }, [searchParams]);
+
     // fetch users everytime filter changes
     useEffect(() => {
         setUsers([]);
         setPage(1);
         setReachedEnd(false);
         filter = true;
+
+        // remove userId from URL
+        const params = new URLSearchParams(searchParams);
+        params.delete('userId');
+        setUserId(null);
+        router.push(`?${params.toString()}`);
+        
         fetchUsers(1);
     }, [token, roleFilter, verifiedFilter, activatedFilter]);
+
+    // update URL when filters change
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (roleFilter) params.set('role', roleFilter);
+        if (verifiedFilter) params.set('verified', verifiedFilter);
+        if (activatedFilter) params.set('activated', activatedFilter);
+        if (userId) params.set('userId', userId);
+        
+        router.push(`?${params.toString()}`);
+    }, [roleFilter, verifiedFilter, activatedFilter, userId]);
 
     // for infinite scroll
     const handleScroll = (e) => {
@@ -174,9 +217,7 @@ export default function UserView() {
     };
 
     const toggleRole = (r) => {
-        console.log(r, roleFilter)
         setRoleFilter(prev => (prev === r ? null : r));
-        console.log(roleFilter)
     };
 
     // compute whether any editable field changed
@@ -301,7 +342,7 @@ export default function UserView() {
                                         </div>
 
                                         {/* expanded editor */}
-                                        {expandedUserId === u.id && (
+                                        {userId === u.id && (
                                             <div className={styles.expandedEditor}>
                                                 <div className={styles.expandedMeta}>
                                                     <div>UTORid: <strong>{u.utorid}</strong></div>
@@ -388,13 +429,15 @@ export default function UserView() {
                                                     <Button variant="primary" disabled={!isDirty} onClick={() => handleSubmit(u.id)}>Submit</Button>
                                                 </div>
                                             </div>
-                                         )}
+                                        )}
                                     </div>
 
                                     <div className={styles.userActions}>
-                                        <Button type="button" variant="secondary" className={styles.showMoreBtn} onClick={() => openEditor(u)}>
-                                            {expandedUserId === u.id ? 'Close' : 'Edit User Info'}
-                                        </Button>
+                                        {!(userId === u.id && window.innerWidth < 720) && (
+                                            <Button type="button" variant="secondary" className={styles.showMoreBtn} onClick={() => openEditor(u)}>
+                                                {userId === u.id ? 'Close' : 'Edit User Info'}
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             );

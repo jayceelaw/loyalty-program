@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-const port = (() => {
+require('dotenv').config(); 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+const port = process.env.PORT || (() => {
     const args = process.argv;
 
     if (args.length !== 3) {
@@ -26,7 +29,7 @@ const app = express();
 app.use(express.json());
 
 // connect to frontend
-app.use(cors({ origin: 'http://localhost:3000',
+app.use(cors({ origin: FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

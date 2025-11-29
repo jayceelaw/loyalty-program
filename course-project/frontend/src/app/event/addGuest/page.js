@@ -18,7 +18,7 @@ export default function AddGuestsPage() {
     const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const backendURL = 'http://localhost:4000';
+    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
     const [notification, setNotification] = useState({ isVisible: false, message: '', type: 'success' });
     const showNotification = (message, type = 'success') => setNotification({ isVisible: true, message, type });

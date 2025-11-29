@@ -4,7 +4,8 @@ import { useAuth } from "./AuthContext";
 
 const NotificationContext = createContext(null);
 export const useNotification = () => useContext(NotificationContext);
-
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+const wsURL = backendURL.replace(/^http/, 'ws');
 
 export function NotificationProvider({children}) {
 
@@ -19,7 +20,7 @@ export function NotificationProvider({children}) {
         // ensure socket only connects once, when user is defined
         if (!user) return; 
 
-        const socket = new WebSocket(`ws://localhost:4000/?utorid=${user.utorid}`);
+        const socket = new WebSocket(`${wsURL}/?utorid=${user.utorid}`);
         socketRef.current = socket;
         
         socket.onopen = () => {

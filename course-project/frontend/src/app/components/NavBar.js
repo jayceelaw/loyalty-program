@@ -22,15 +22,16 @@ export default function NavBar() {
   const settingDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const { logout, currentInterface } = useAuth();
+
   const navItems = [
     { label: 'Dashboard', path: '/user' },
     { label: 'QR', path: '/user/qr' },
     // { label: 'Events', path: '/event' },
   ];
-  if (!EventMenu()) {
+  if (!EventMenu({})) {
     navItems.push({ label: 'Events', path: '/event' });
   }
-  if (!PromotionMenu()) {
+  if (!PromotionMenu({})) {
     navItems.push({ label: 'Promotions', path: '/promotion' });
   }
   
@@ -42,14 +43,26 @@ export default function NavBar() {
     specialItems.push({ label: 'View Users', path: '/user/view' });
   }
 
+  const extraNavPaths = ['/event', '/promotion', '/transaction'];
+
   // Helper to normalize paths for comparison (handle trailing slashes)
   const normalizePath = (path) => path.endsWith('/') ? path.slice(0, -1) : path;
+  const isActive = (path) => {
+    const curr_path = normalizePath(pathname || '');
+    const target_path = normalizePath(path);
 
-  const isActive = (path) => normalizePath(pathname) === normalizePath(path);
+    // treat root "/" as dashboard same as "/user"
+    if ((curr_path === '/' || curr_path === '') && target_path === '/user') return true;
+    if (curr_path === target_path) return true;
+    if (target_path === '/event' || target_path === '/promotion' || target_path === '/transaction') {
+        return curr_path === target_path || curr_path.startsWith(target_path + '/');
+    }
+  };
 
   // Check if current page is in the main nav
   const isMainNavPage = navItems.some(item => normalizePath(item.path) === normalizePath(pathname))
-                        || specialItems.some(item => normalizePath(item.path) === normalizePath(pathname));
+                        || specialItems.some(item => normalizePath(item.path) === normalizePath(pathname))
+                        || extraNavPaths.some(p => normalizePath(pathname).startsWith(normalizePath(p)));
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -86,7 +99,6 @@ export default function NavBar() {
           });
         }
       } else {
-        // Hide indicator when not on a main nav page
         setIndicatorStyle({
           opacity: 0,
         });
@@ -111,16 +123,15 @@ export default function NavBar() {
             <Link
               key={item.path}
               href={item.path}
-              className={`${styles.navTab} ${
-                isActive(item.path) ? styles.active : ''
-              }`}
+              className={`${styles.navTab} ${ isActive(item.path) ? styles.active : '' }`}
             >
               {item.label}
             </Link>
           ))}
-          <EventMenu/>
-          <PromotionMenu/>
-          <TransactionMenu/>
+
+          <EventMenu className={`${styles.navTab} ${isActive('/event') ? styles.active : ''}`} />
+          <PromotionMenu className={`${styles.navTab} ${isActive('/promotion') ? styles.active : ''}`} />
+          <TransactionMenu className={`${styles.navTab} ${isActive('/transaction') ? styles.active : ''}`} />
 
           {/* Divider */}
           {specialItems.length > 0 && <div className={styles.divider} />}
@@ -130,9 +141,7 @@ export default function NavBar() {
             <Link
               key={item.path}
               href={item.path}
-              className={`${styles.navTab} ${
-                isActive(item.path) ? styles.active : ''
-              }`}
+              className={`${styles.navTab} ${isActive(item.path) ? styles.active : ''}`}
             >
               {item.label}
             </Link>
@@ -142,7 +151,7 @@ export default function NavBar() {
         {/* User Menu - outside the pill */}
         <div className={styles.userMenuWrapper} ref={settingDropdownRef}>
           <button
-            className={styles.userMenuButton}
+            className={styles.button}
             onClick={() => {
               setIsUserMenuOpen(!isUserMenuOpen);
               setIsNotificationOpen(false);
@@ -182,7 +191,7 @@ export default function NavBar() {
 
         {/* Notifications */}
         <div className={styles.userMenuWrapper} ref={notificationDropdownRef}>
-          <NotificationButton toggle={
+          <NotificationButton  className={styles.button} toggle={
               () => {
               setIsNotificationOpen(!isNotificationOpen);
               setIsUserMenuOpen(false);
