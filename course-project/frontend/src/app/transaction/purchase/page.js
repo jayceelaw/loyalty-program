@@ -84,7 +84,7 @@ export default function Purchase() {
 
     return (
         <div className="main-container">
-            {currentInterface == 'manager' || currentInterface == 'superuser' || currentInterface == 'cashier' ? 
+            {currentInterface === 'manager' || currentInterface === 'superuser' || currentInterface === 'cashier' ? 
             <>
                 <h1>Create Purchase</h1>
                 <div className="form">

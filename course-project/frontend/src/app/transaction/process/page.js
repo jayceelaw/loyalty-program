@@ -72,7 +72,7 @@ export default function Process() {
 
     return (
         <div className="main-container">
-            {currentInterface == 'manager' || currentInterface == 'superuser' || currentInterface == 'cashier' ? 
+            {currentInterface === 'manager' || currentInterface === 'superuser' || currentInterface === 'cashier' ? 
             <>
                 <h1>Process Redemption</h1>
                 <div className="form">

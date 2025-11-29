@@ -114,7 +114,7 @@ export default function Adjust() {
 
     return (
         <div className="main-container">
-            {currentInterface == 'manager' || currentInterface == 'superuser' ? 
+            {currentInterface === 'manager' || currentInterface === 'superuser' ? 
             <>
                 <h1>Adjust Transaction</h1>
                 <TransactionCard {...transactionData} showAll={true} id={transactionId} hideAdjust={true}/>
