@@ -9,15 +9,18 @@ import styles from './NavigationBar.module.css';
 import Link from 'next/link';
 import Symbol from './Symbol';
 import colors from '../constants/colors';
+import Notifications from './Notifications';
+import NotificationButton from './NotificationButton';
 
 export default function NavBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [ isNotificationOpen, setIsNotificationOpen ] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState({});
-  const [userData, setUserData] = useState(null);
   const navRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const settingDropdownRef = useRef(null);
+  const notificationDropdownRef = useRef(null);
   const { logout, currentInterface } = useAuth();
   const navItems = [
     { label: 'Dashboard', path: '/user' },
@@ -51,19 +54,24 @@ export default function NavBar() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (settingDropdownRef.current && !settingDropdownRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
+        
+      }
+
+      if (notificationDropdownRef.current && !notificationDropdownRef.current.contains(event.target)) {
+        setIsNotificationOpen(false);
       }
     };
 
-    if (isUserMenuOpen) {
+    if (isUserMenuOpen || isNotificationOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isUserMenuOpen]);
+  }, [isUserMenuOpen, isNotificationOpen]);
 
   useEffect(() => {
     const updateIndicator = () => {
@@ -132,10 +140,13 @@ export default function NavBar() {
         </div>
 
         {/* User Menu - outside the pill */}
-        <div className={styles.userMenuWrapper} ref={dropdownRef}>
+        <div className={styles.userMenuWrapper} ref={settingDropdownRef}>
           <button
             className={styles.userMenuButton}
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            onClick={() => {
+              setIsUserMenuOpen(!isUserMenuOpen);
+              setIsNotificationOpen(false);
+            }}
             aria-label="User menu"
           >
             <Symbol
@@ -147,12 +158,6 @@ export default function NavBar() {
 
           {isUserMenuOpen && (
             <div className={styles.dropdown}>
-              {userData && (
-                <div className={styles.userInfo}>
-                  <div className={styles.username}>{userData.username}</div>
-                  <div className={styles.userEmail}>{userData.email}</div>
-                </div>
-              )}
               <Link
                 href="/settings"
                 className={styles.dropdownItem}
@@ -173,6 +178,22 @@ export default function NavBar() {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Notifications */}
+        <div className={styles.userMenuWrapper} ref={notificationDropdownRef}>
+          <NotificationButton toggle={
+              () => {
+              setIsNotificationOpen(!isNotificationOpen);
+              setIsUserMenuOpen(false);
+          }}/>
+          
+          {isNotificationOpen && (
+            <div className={styles.dropdown}>
+              <Notifications />
+            </div>
+          )}
+
         </div>
       </div>
     </nav>
