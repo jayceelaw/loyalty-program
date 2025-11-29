@@ -33,8 +33,7 @@ export default function Adjust() {
     useEffect(() =>{
         if (!user) return;
          fetch(`/transactions/${transactionId}`, {
-            // headers: { 'Authorization': `Bearer ${token}`,
-            //             'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json'},
             credentials: 'include'
         })
         .then(response => {
@@ -84,8 +83,7 @@ export default function Adjust() {
         }));       
 
         fetch(`/transactions`, {
-            // headers: { 'Authorization': `Bearer ${token}`,
-            //             'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json'},
             method: "POST",
             credentials: 'include',
             body: JSON.stringify(relevantOptions)

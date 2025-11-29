@@ -38,8 +38,7 @@ export default function Process() {
         }
 
         fetch(`/transactions/${transactionID}/processed`, {
-            // headers: { 'Authorization': `Bearer ${token}`,
-            //             'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json'},
             method: "PATCH",
             credentials: 'include',
             body: JSON.stringify({ processed: true })

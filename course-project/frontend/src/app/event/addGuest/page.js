@@ -75,10 +75,10 @@ export default function AddGuestsPage() {
         try {
             const res = await fetch(`${backendURL}/events/${currentEventId}/guests`, {
                 method: 'POST',
-                // headers: {
-                //     'Content-Type': 'application/json',
-                //     Authorization: `Bearer ${token}`,
-                // },
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Authorization: `Bearer ${token}`,
+                },
                 credentials: 'include',
                 body: JSON.stringify({ utorid: newGuestUtorid.trim() }),
             });

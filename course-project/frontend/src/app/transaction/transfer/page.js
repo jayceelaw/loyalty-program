@@ -38,8 +38,7 @@ export default function Transfer() {
         }
 
         fetch(`/users/${recipientID}/transactions`, {
-            // headers: { 'Authorization': `Bearer ${token}`,
-            //             'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json'},
             credentials: 'include',
             method: "POST",
             body: JSON.stringify({ 

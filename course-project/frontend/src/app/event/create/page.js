@@ -57,7 +57,7 @@ export default function CreateEvent() {
 
             const res = await fetch(`${backend}/events`, {
                 method: 'POST',
-                // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(payload)
             });

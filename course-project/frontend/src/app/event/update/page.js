@@ -110,10 +110,10 @@ export default function UpdateEvent() {
       if (!token) throw new Error('Not logged in');
       const res = await fetch(`${backend}/events/${idNum}`, {
         method: 'PATCH',
-        // headers: {
-        //   'Content-Type': 'application/json',
+        headers: {
+          'Content-Type': 'application/json',
         //   Authorization: `Bearer ${token}`
-        // },
+        },
         credentials: 'include',
         body: JSON.stringify(payload)
       });

@@ -58,10 +58,10 @@ export default function UserView() {
 
         const res = await fetch(`/users?${params}`, {
             method: 'GET',
-            // headers: {
-            //     'Content-Type': 'application/json',
-            //     ...(token ? { Authorization: `Bearer ${token}` } : {})
-            // }
+            headers: {
+                'Content-Type': 'application/json',
+                // ...(token ? { Authorization: `Bearer ${token}` } : {})
+            },
             credentials: 'include'
         });
         const data = await res.json();
@@ -140,8 +140,9 @@ export default function UserView() {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    // ...(token ? { Authorization: `Bearer ${token}` } : {})
                 },
+                credentials: include,
                 body: JSON.stringify(payload)
             });
             const data = await res.json();

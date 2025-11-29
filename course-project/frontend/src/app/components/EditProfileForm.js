@@ -94,7 +94,8 @@ export default function EditProfileForm() {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
+            // ...(token ? { Authorization: `Bearer ${token}` } : {})
+            credentials: 'include',
           },
           body: JSON.stringify({
             name: name.trim(),
