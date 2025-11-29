@@ -1,44 +1,53 @@
 'use client';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styles from './page.module.css';
 import PromotionSearchBar from '../components/PromotionSearchBar'
 import PrimaryActionDropDownButton from '../components/PrimaryActionDropDownButton';
 import { useAuth } from '../../context/AuthContext'; 
-import Button from '../components/Button'
-import colors from '../constants/colors';
-
+import PromotionCard from '../components/PromotionCard'
 
 export default function PromotionsPage() {
+  const {token, currentInterface} = useAuth();
+  const scrollRef = useRef();
+  
   const [promotions, setPromotions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(null);
-  const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
-  const [typeFilter, setTypeFilter] = useState('');
+
+  // loading and error and message
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // pagination
   const [page, setPage] = useState(1);
   const [reachedEnd, setReachedEnd] = useState(false);
-  const [searchName, setSearchName] = useState(''); // input field value
-  const [appliedSearchTerm, setAppliedSearchTerm] = useState(''); // term actually used for filtering
 
-  // pending inputs for filters (commit on Search)
-  const [startAfter, setStartAfter] = useState('');       // datetime-local string
-  const [endBefore, setEndBefore] = useState('');         // datetime-local string
-  const [rateMin, setRateMin] = useState('');             // number string
-  const [minSpendMin, setMinSpendMin] = useState('');     // number string
-  const [pointsMin, setPointsMin] = useState('');         // number string
+  // search bar
+  const [searchName, setSearchName] = useState(''); 
+  const [appliedSearchTerm, setAppliedSearchTerm] = useState(''); 
 
-  //  applied filters (used by fetch)
+  // filtering
+  const [typeFilter, setTypeFilter] = useState('');
+  const [startAfter, setStartAfter] = useState('');       
+  const [endBefore, setEndBefore] = useState('');        
+  const [rateMin, setRateMin] = useState('');             
+  const [minSpendMin, setMinSpendMin] = useState('');    
+  const [pointsMin, setPointsMin] = useState('');       
+
+  //  applied filters
   const [appliedStartAfter, setAppliedStartAfter] = useState('');
   const [appliedEndBefore, setAppliedEndBefore] = useState('');
   const [appliedRateMin, setAppliedRateMin] = useState('');
   const [appliedMinSpendMin, setAppliedMinSpendMin] = useState('');
   const [appliedPointsMin, setAppliedPointsMin] = useState('');
 
-  const { currentInterface } = useAuth(); 
 
+  // useCallback memoizes the function - React keeps the same reference between renders unless dependencies change
   const fetchPromotions = useCallback(async (targetPage = 1, replace = true) => {
-    if (!backend) return;
+    if (loading) return;
+
     setLoading(true);
-    setErr(null);
+    setError(false);
+    
     try {
     //   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     //   if (!token) throw new Error('Not logged in');
@@ -47,8 +56,10 @@ export default function PromotionsPage() {
         // headers: { Authorization: `Bearer ${token}` }
         credentials: 'include'
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
 
       let list = data.results || [];
 
@@ -86,17 +97,20 @@ export default function PromotionsPage() {
         list = list.filter(p => p.points != null && Number(p.points) >= ptMin);
       }
 
-      const startIdx = (targetPage - 1) * 10;
-      const batch = list.slice(startIdx, startIdx + 10);
-      setPromotions(prev => replace ? batch : [...prev, ...batch]);
-      if (batch.length < 10 || startIdx + 10 >= list.length) setReachedEnd(true);
-      setPage(targetPage + 1);
+      // pagination
+      const startIdx = (targetPage - 1) * 10; // next 10 promotions start idx based on page
+      const batch = list.slice(startIdx, startIdx + 10); // next 10 promotions
+      setPromotions(prev => replace ? batch : [...prev, ...batch]); // append to existing array, for infinite scroll
+      if (batch.length < 10 || startIdx + 10 >= list.length) setReachedEnd(true); // if fewer than 10 items were returned - reached the end
+      setPage(targetPage + 1); // increment page for next fetch
+
     } catch (e) {
-      setErr(e.message);
+      setError(true);
+      setMessage(e.toString())
     } finally {
       setLoading(false);
     }
-  }, [backend, typeFilter, appliedSearchTerm, appliedStartAfter, appliedEndBefore, appliedRateMin, appliedMinSpendMin, appliedPointsMin]);
+  }, [token, typeFilter, appliedSearchTerm, appliedStartAfter, appliedEndBefore, appliedRateMin, appliedMinSpendMin, appliedPointsMin, loading]);
 
   const triggerSearch = () => {
     // Commit all current inputs then refetch
@@ -107,8 +121,9 @@ export default function PromotionsPage() {
     setAppliedMinSpendMin(minSpendMin);
     setAppliedPointsMin(pointsMin);
 
+    // reset page
     setPromotions([]);
-    setPage(1);
+    setPage(1); 
     setReachedEnd(false);
     fetchPromotions(1, true);
   };
@@ -129,47 +144,35 @@ export default function PromotionsPage() {
     }
   };
 
+  if (scrollRef.current) {
+    scrollRef.current.scrollTop = 0;
+  }
+
   const handleDelete = async (id) => {
-    if (!backend) return;
-    // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    // if (!token) { console.warn('[Delete] no token'); return; }
-    if (!['manager','superuser'].includes(currentInterface)) {
-      console.warn('[Delete] interface not allowed:', currentInterface);
-      return;
-    }
-    if (!window.confirm(`Delete promotion #${id}?`)) return;
-
-    try {
-      const url = `${backend}/promotions/${id}`;
-      console.log('[Delete] DELETE', url);
-      const res = await fetch(url, {
-        method: 'DELETE',
-        // headers: { Authorization: `Bearer ${token}` }
-        credentials: 'include'
-      });
-
-      if (res.status === 204) {
-        console.log('[Delete] success (204) for id:', id);
+      if (!token) {return; }
+      if (!window.confirm(`Delete promotion #${id}?`)) return;
+  
+      try {
+        const url = `/promotions/${id}`;
+        const res = await fetch(url, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+  
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.error);
+  
         setPromotions(prev => prev.filter(p => p.id !== id));
-        alert('Successfully deleted promotion.');
-        return;
+        setMessage('Delete Promotion Successful!');
+        setError(false);
+  
+      } catch (e) {
+        setError(true);
+        setMessage(e.toString());
       }
+    };
 
-      let bodyText = '';
-      try { bodyText = await res.text(); } catch {}
-      console.warn('[Delete] non-204 status:', res.status, 'body:', bodyText);
-
-      if (res.status === 403) {
-        // returns 403 when promotion already started or role insufficient
-        alert('Cannot delete: promotion already started or insufficient permissions.');
-      } else {
-        alert(`Delete failed (${res.status}). ${bodyText || ''}`);
-      }
-    } catch (e) {
-      console.error('[Delete] network/error:', e);
-      alert(`Delete failed: ${e.message || 'Network error'}`);
-    }
-  };
+  
 
   return (
     <div className={styles.pageContainer}>
@@ -183,18 +186,6 @@ export default function PromotionsPage() {
         />
 
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-          {/* <label style={{ fontSize: 14 }}>
-            Type:&nbsp;
-            <select
-              value={typeFilter}
-              onChange={(e) => { setTypeFilter(e.target.value); setPage(1); setReachedEnd(false); }}
-              style={{ padding: '6px 8px', borderRadius: 6 }}
-            >
-              <option value=''>All</option>
-              <option value='automatic'>Automatic</option>
-              <option value='one-time'>One-time</option>
-            </select>
-          </label> */}
 
           {/* Type filter */}
           <div className={styles.filterItem}>
@@ -263,43 +254,15 @@ export default function PromotionsPage() {
             Apply Filters
           </button>
         </div>
-
-        <div className={styles.resultsContainer}>
-          <div className={styles.resultsCard}>
-            <div className={styles.promotionList} onScroll={handleScroll}>
-              {loading && <div>Loading…</div>}
-              {err && <div style={{ color: 'red' }}>Error: {err}</div>}
-              {!loading && !err && promotions.length === 0 && <div>No promotions found</div>}
-              {!loading && !err && promotions.map(p => (
-                <div key={p.id} className={styles.resultItem}>
-                  <div style={{ marginBottom: 8 }}>
-                    <span className={styles.promotionName}>{p.name}</span>
-                    <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>ID: {p.id}</div>
-                    <div><strong>Start:</strong> {p.startTime ? new Date(p.startTime).toLocaleString() : '—'}</div>
-                    <div><strong>End:</strong> {p.endTime ? new Date(p.endTime).toLocaleString() : '—'}</div>
-                    {p.description && <div><strong>Description:</strong> {p.description}</div>}
-                    {p.minSpending != null && <div><strong>Min Spend:</strong> {p.minSpending}</div>}
-                    {p.rate != null && <div><strong>Rate:</strong> {p.rate}</div>}
-                    {p.points != null && <div><strong>Points:</strong> {p.points}</div>}
-                  </div>
-                  <span className={styles.roleBadge} style={{ textTransform: 'uppercase' }}>{p.type}</span>
-                  {['manager','superuser'].includes(currentInterface) && (
-                    <div className={styles.cardActions}>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => handleDelete(p.id)}
-                        className={`${styles.deleteBtn} ${styles.deleteDanger}`}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {reachedEnd && promotions.length > 0 && <div style={{ padding: 8, opacity: 0.6 }}></div>}
-            </div>
-          </div>
+        <div ref={scrollRef} onScroll={handleScroll}>
+          {promotions.map(p => (
+            <PromotionCard
+              key={p.id}
+              {...p}
+              canDelete={['manager','superuser'].includes(currentInterface)}
+              onDelete={handleDelete}
+            />
+          ))}
         </div>
       </main>
     </div>
