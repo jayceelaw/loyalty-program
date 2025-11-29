@@ -105,11 +105,6 @@ export function NotificationProvider({children}) {
         socketRef.current.send(JSON.stringify({id: id, view: true}));
     }
 
-    // sends to all regular users
-    const announce = (utorid, message) => {
-        socketRef.current.send(JSON.stringify({ announcer: utorid, message: message }))
-    }
-
     return (
         <NotificationContext.Provider value={{
             notify,
@@ -119,7 +114,6 @@ export function NotificationProvider({children}) {
             setNotifications,
             unseen,
             setUnseen,
-            announce,
             result
         }}>
             {children}
