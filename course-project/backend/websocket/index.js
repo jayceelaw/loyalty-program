@@ -9,7 +9,7 @@ const clients = new Map();
 let wss; // websocket instance
 
 const { storeNotification, clearNotifications, 
-      retrieveNotifications, viewNotification, regularUsers } = require('../routes/notifications'); 
+      retrieveNotifications, viewNotification } = require('../routes/notifications'); 
 
 require('dotenv').config(); 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
