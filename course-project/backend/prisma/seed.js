@@ -484,6 +484,10 @@ async function main() {
 		createdBy: 'john123',
 		amount: 400,
 		spent: 100,
+		promotionIds: { connect: [
+			{ id: 1 },
+			{ id: 2 }
+		]}
 	},
 
 	{
@@ -494,6 +498,7 @@ async function main() {
 		createdBy: 'superusr',
 		amount: 200,
 		spent: 50,
+		promotionIds: { connect: { id: 4 }}
 	},
 
 	{
@@ -504,6 +509,7 @@ async function main() {
 		createdBy: 'suscash',
 		amount: 1000,
 		spent: 250,
+		suspicious: true
 	},
 
 	{
@@ -514,6 +520,8 @@ async function main() {
 		createdBy: 'suscash',
 		amount: 120,
 		spent: 30,
+		suspicious: true,
+		promotionIds: { connect: { id: 4 }}
 	},
 
 	{
@@ -524,6 +532,7 @@ async function main() {
 		createdBy: 'alice123',
 		amount: 40,
 		spent: 10,
+		promotionIds: { connect: { id: 4 }}
 	},
 
 	{
@@ -672,15 +681,20 @@ async function main() {
 		amount: -2,
 	},
 
-	// 2 adjustments
+	// 6 adjustments
 	{
 		id: 9,
 		utorid: 'superusr',
 		type: 'adjustment',
-		remark: 'apply promotion 1',
+		remark: 'apply promotions',
 		createdBy: 'superusr',
 		relatedId: 1,
 		amount: 50,
+		promotionIds: { connect: [
+			{ id: 1 },
+			{ id: 2 },
+			{ id: 4 }
+  		]}
 	},
 
 	{
@@ -729,9 +743,88 @@ async function main() {
 		createdBy: 'superusr',
 		relatedId: 20,
 		amount: 2,
-	}
+	},
 
+	// 6 events
+	{
+		id: 25,
+		recipient: 'reguser',
+		utorid: 'reguser',
+		amount: 200,
+		awarded: 200,
+		type: 'event',
+		relatedId: 1,
+		eventId: 1,
+		remark: "first place winner",
+		createdBy: 'alice123'
+	},
+
+	{
+		id: 26,
+		recipient: 'userabc1',
+		utorid: 'userabc1',
+		amount: 100,
+		awarded: 100,
+		type: 'event',
+		relatedId: 1,
+		eventId: 1,
+		remark: "second place winner",
+		createdBy: 'alice123'
+	},
+
+	{
+		id: 27,
+		recipient: 'userabc1',
+		utorid: 'userabc1',
+		amount: 10,
+		awarded: 10,
+		type: 'event',
+		relatedId: 4,
+		eventId: 4,
+		remark: "artist participation",
+		createdBy: 'john123'
+	},
+
+	{
+		id: 28,
+		recipient: 'student1',
+		utorid: 'student1',
+		amount: 10,
+		awarded: 10,
+		type: 'event',
+		relatedId: 4,
+		eventId: 4,
+		remark: "artist participation",
+		createdBy: 'john123'
+	},
+
+	{
+		id: 29,
+		recipient: 'reguser',
+		utorid: 'reguser',
+		amount: 10,
+		awarded: 10,
+		type: 'event',
+		relatedId: 4,
+		eventId: 4,
+		remark: "artist participation",
+		createdBy: 'john123'
+	},
+
+	{
+		id: 30,
+		recipient: 'tester1',
+		utorid: 'tester1',
+		amount: 35,
+		awarded: 35,
+		type: 'event',
+		relatedId: 5,
+		eventId: 5,
+		remark: "best performance",
+		createdBy: 'john123'
+	}
   ]
+
   for (const t of transactions) {
 	await prisma.transaction.upsert({
 	  	where: { id: t.id },

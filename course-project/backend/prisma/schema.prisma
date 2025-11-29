@@ -54,6 +54,8 @@ model User {
   organizedEvents   Event[]         // events this user organizes (many-to-many)
   eventGuests       EventGuest[]    // explicit guest entries (rsvp/confirmed)
 
+  notifications     Notification[]    @relation("UserNotifications")
+
 }
 
 model Transaction {
@@ -140,4 +142,13 @@ model EventGuest {
   // additional fields (e.g. timestamp) can be added if needed
 
   @@unique([userId, eventId])
+}
+
+model Notification {
+  id          Int           @id @default(autoincrement())
+  utorid      String        
+  message     String
+  seen        Boolean       @default(false)
+  time        DateTime
+  user        User          @relation(fields: [utorid], references: [utorid], "UserNotifications")
 }
