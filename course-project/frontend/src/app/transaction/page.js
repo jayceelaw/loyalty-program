@@ -4,14 +4,16 @@ import TransactionCard from '../components/TransactionCard';
 import TransactionFilter from '../components/TransactionFilter';
 import styles from '@/app/transaction/transaction.module.css';
 import { useAuth } from '@/context/AuthContext';
+import { useSearchParams } from 'next/navigation';
+import { requestAsyncStorage } from 'next/dist/client/components/request-async-storage-instance';
 
 
 export default function TransactionsListPage() {
 
   const PAGELIMIT = 5;
-  const { currentInterface } = useAuth();
+  const { token, currentInterface } = useAuth();
   const [ transactions, setTransactions ] = useState([]);
-  const [ filter, setFilter ] = useState({});
+  // const [ filter, setFilter ] = useState({});
   const [ showAll, setShowAll ] = useState(false);
   const [ page, setPage ] = useState(1);
   const [ end, setEnd ] = useState(false);
@@ -20,6 +22,8 @@ export default function TransactionsListPage() {
   const [ error, setError ] = useState(false);
   const scrollRef = useRef();
   const backendURL = 'http://localhost:4000';
+  const searchParams = useSearchParams();
+  const filter = Object.fromEntries(searchParams.entries());
 
   useEffect(() => {
     if (currentInterface) {
@@ -27,6 +31,7 @@ export default function TransactionsListPage() {
     }
   }, [currentInterface]);
 
+  // show current user's transactions
   const loadRegular = async () => {
     const url = new URL(backendURL + '/users/me/transactions');
 
@@ -38,7 +43,7 @@ export default function TransactionsListPage() {
     url.search = new URLSearchParams(relevantFilters).toString();
 
     fetch(url, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+      headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(response => {
       return response.json().then(result => {
@@ -57,6 +62,7 @@ export default function TransactionsListPage() {
     });
   }
 
+  // show all transactions
   const loadPrivileged = async () => {
     const url = new URL(backendURL + '/transactions');
   
@@ -69,11 +75,14 @@ export default function TransactionsListPage() {
     url.search = new URLSearchParams(relevantFilters).toString();
 
     fetch(url, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+      headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(response => {
       return response.json().then(result => {
         if (!response.ok) {
+          if (response.status === 401) {
+              router.replace('/login');
+          }
           throw new Error(result.error);
         }
         else {
@@ -112,6 +121,7 @@ export default function TransactionsListPage() {
   }
 
   const load = (specificPage) => {
+    if (!token) return;
     filter.page = specificPage === 1 ? 1 : page;
     filter.limit = PAGELIMIT;
 
@@ -140,7 +150,7 @@ export default function TransactionsListPage() {
       scrollRef.current.scrollTop = 0;
     }
 
-  }, [filter, showAll]);
+  }, [searchParams, showAll]);
 
   const handleScroll = (e) => {
     const bottomReached = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;
@@ -153,7 +163,7 @@ export default function TransactionsListPage() {
     <div className='main-container'>
       <h1>My Transactions</h1>
         <p className={'error ' + (error ? '' : styles.hidden)}>{errorMessage}</p>
-        <TransactionFilter setFilter={setFilter} showAll={showAll}/>
+        <TransactionFilter showAll={showAll}/>
        {!loading ? <div ref={scrollRef} onScroll={handleScroll} className={styles.infiniteScroll}>
           {transactions.map((t, index) => {
             return <TransactionCard key={index} {...t} showAll={showAll}/>

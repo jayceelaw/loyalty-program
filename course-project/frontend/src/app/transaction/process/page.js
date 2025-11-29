@@ -2,13 +2,16 @@
 import { PrimaryButton } from "@/app/components/Button";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
-import { useSearchParams } from "next/navigation";
+import { useNotification } from "@/context/NotificationContext";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Process() {
 
+    const router = useRouter();
+    const { notify } = useNotification();
     const searchParams = useSearchParams();
-    const defaultTransactionID = searchParams.get("transactionId");
+    const defaultTransactionID = searchParams.get("transactionId") || "";
     const { user, loadUser, token, currentInterface } = useAuth();
     const [ transactionID, setTransactionID ] = useState(defaultTransactionID);
     const [ message, setMessage ] = useState("");
@@ -35,15 +38,20 @@ export default function Process() {
             body: JSON.stringify({ processed: true })
         })
         .then(response => {
+            if (response.status === 401) {
+                router.replace('/login');
+                return;
+            }
             return response.json().then(result => {
                 if (!response.ok) {
-                throw new Error(result.error);
+                    throw new Error(result.error);
                 }
                 else {
-                setMessage(`ID${result.id}: Redemption successfully processed!`);
-                if (result.utorid === user.utorid) {
-                    loadUser();
-                }
+                    setMessage(`ID${result.id}: Redemption successfully processed!`);
+                    notify(result.utorid, `ID${result.id}: Redemption of ${result.redeemed} pts processed.`);
+                    if (result.utorid === user.utorid) {
+                        loadUser();
+                    }
                 }
             });
         })
@@ -70,7 +78,6 @@ export default function Process() {
             
             </>
             : currentInterface ? '403 Forbidden' : <div className="spinner"></div>}
-           
         </div>
     );
 }

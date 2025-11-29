@@ -1,12 +1,15 @@
 'use client';
-import { transfer } from "@/lib/transactions";
 import { PrimaryButton } from "@/app/components/Button";
 import { useState } from "react";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
+import { useRouter } from "next/navigation";
 export default function Purchase() {
 
-    const { token, currentInterface } = useAuth();
+    const router = useRouter();
+    const { notify } = useNotification();
+    const { token, currentInterface, user, loadUser } = useAuth();
     const [ utorid, setUtorid ] = useState("");
     const [ spent, setSpent ] = useState("");
     const [ promotions, setPromotions ] = useState("");
@@ -46,13 +49,20 @@ export default function Purchase() {
             body: JSON.stringify(relevantOptions)
         })
         .then(response => {
+            if (response.status === 401) {
+                router.replace('/login');
+                return;
+            }
             return response.json().then(result => {
                 if (!response.ok) {
                     throw new Error(result.error);
                 }
                 else {
                     setMessage(`ID${result.id}: Purchase successfully created!`);
-                    console.log(result);
+                    notify(result.utorid, `ID${result.id}: Earned ${result.amount} pts from purchase of $${result.spent}.`);
+                    if (result.utorid === user.utorid) {
+                        loadUser();
+                    }
                 }
             });
         })
@@ -72,12 +82,12 @@ export default function Purchase() {
             <>
                 <h1>Create Purchase</h1>
                 <div className="form">
-                    <h5>Utorid</h5>
+                    <h5>UTORid</h5>
                     <input type="text" value={utorid} onChange={e=>setUtorid(e.target.value)}></input>
                     <h5>Spent</h5>
                     <input type="text" value={spent} onChange={e=>setSpent(e.target.value)}></input>
                     <h5>Promotion IDs</h5>
-                    <input type="text" value={promotions} onChange={e=>setPromotions(e.target.value)}></input>
+                    <input type="text" value={promotions} placeholder="ie. 1, 2" onChange={e=>setPromotions(e.target.value)}></input>
                     <h5>Remark</h5>
                     <textarea value={remark} onChange={e=>setRemark(e.target.value)}></textarea>
                     <FeedBackMessage error={error} message={message}/>

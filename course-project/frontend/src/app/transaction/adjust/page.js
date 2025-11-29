@@ -1,16 +1,19 @@
 'use client';
-import { BackButton, PrimaryButton } from "@/app/components/Button";
+import { PrimaryButton } from "@/app/components/Button";
 import { useEffect, useState } from "react";
 import TransactionCard from "@/app/components/TransactionCard";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
 
 export default function Adjust() {
 
     const { token, currentInterface } = useAuth();
+    const { notify } = useNotification();
     const router = useRouter();
-    const transactionID = localStorage.getItem("transactionID");
+    const searchParams = useSearchParams();
+    const transactionId = searchParams.get("transactionId") || "";
     const [ utorid, setUtorid ] = useState()
     const [ amount, setAmount ] = useState("");
     const [ promotions, setPromotions ] = useState("");
@@ -22,11 +25,16 @@ export default function Adjust() {
 
     // // retrieve transaction info
     useEffect(() =>{
-         fetch(`/transactions/${transactionID}`, {
+        if (!token) return;
+         fetch(`/transactions/${transactionId}`, {
             headers: { 'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'},
         })
         .then(response => {
+            if (response.status === 401) {
+                router.replace('/login');
+                return;
+            }
             return response.json().then(result => {
                 if (!response.ok) {
                     throw new Error(result.error);
@@ -34,19 +42,16 @@ export default function Adjust() {
                 else {
                     setTransactionData(result);
                     setUtorid(result.utorid);
-                    console.log(result);
                 }
             });
         })
         .catch(err => {
-            console.log(err);
             setMessage(err.toString());
             setError(true);
         });
-    }, [transactionID]);
+    }, [transactionId, token]);
 
     async function handleAdjust() {
-        console.log(loading);
         if (loading) return;
         setLoading(true);
         setError(false);
@@ -63,7 +68,7 @@ export default function Adjust() {
             type: "adjustment",
             utorid: utorid,
             amount: Number(amount),
-            relatedId: Number(transactionID),
+            relatedId: Number(transactionId),
             promotionIds: promotionIdArray,
             remark: remark
         }
@@ -78,6 +83,10 @@ export default function Adjust() {
             body: JSON.stringify(relevantOptions)
         })
         .then(response => {
+            if (response.status === 401) {
+                router.replace('/login');
+                return;
+            }
             return response.json().then(result => {
                 if (!response.ok) {
                     throw new Error(result.error);
@@ -85,10 +94,10 @@ export default function Adjust() {
                 else {
                     setMessage(`ID${result.id}: Adjustment successfully created!`);
                 }
+                notify(utorid, `ID${result.id}: Adjusted Transaction ${transactionId} by ${result.amount} pts.`);
             });
         })
         .catch(err => {
-            console.log(err);
             setMessage(err.toString());
             setError(true);
         })
@@ -102,17 +111,16 @@ export default function Adjust() {
             {currentInterface == 'manager' || currentInterface == 'superuser' ? 
             <>
                 <h1>Adjust Transaction</h1>
-                <TransactionCard {...transactionData} showAll={true} id={transactionID} hideAdjust={true}/>
+                <TransactionCard {...transactionData} showAll={true} id={transactionId} hideAdjust={true}/>
                 <div className="form">
                     <h5>Amount</h5>
                     <input type="text" value={amount} onChange={e=>setAmount(e.target.value)}></input>
                     <h5>Promotion IDs</h5>
-                    <input type="text" value={promotions} onChange={e=>setPromotions(e.target.value)}></input>
+                    <input type="text" value={promotions} placeholder="ie. 1, 2" onChange={e=>setPromotions(e.target.value)}></input>
                     <h5>Remark</h5>
                     <textarea value={remark} onChange={e=>setRemark(e.target.value)}></textarea>
                     <FeedBackMessage error={error} message={message}/>
-                    <PrimaryButton className="submit" text={loading ? "Adjusting..." : "Adjust"}onClick={() => {if (!loading) handleAdjust()}}/>
-                    <BackButton text="Back" onClick={() => router.replace('/transaction')}/>
+                    <PrimaryButton className="submit" text={loading ? "Adjusting..." : "Adjust"}onClick={() => {if (!loading) handleAdjust()}}/>                    
                 </div>
             </>: 
             currentInterface ? '403 Forbidden' : <div className="spinner"></div>}

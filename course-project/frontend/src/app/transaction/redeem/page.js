@@ -44,8 +44,7 @@ export default function Redeem() {
             });
         })
         .then(data => {
-            localStorage.setItem("transactionID", data.id);
-            router.push('/transaction/redeemQr'); 
+            router.push(`/transaction/redeemQr?transactionId=${data.id}`); 
         })
         .catch(err => {
             console.log(err);

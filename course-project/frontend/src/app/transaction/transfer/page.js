@@ -4,11 +4,12 @@ import { useState } from "react";
 import PointsBalance from "@/app/components/PointsBalance";
 import { useAuth } from "@/context/AuthContext";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 export default function Transfer() {
 
+    const router = useRouter();
     const searchParams = useSearchParams();
-    const defaultRecipient = searchParams.get("utorid");
+    const defaultRecipient = searchParams.get("utorid") || '';
     const { loadUser, token } = useAuth();
     const [ recipientID, setRecipientID ] = useState(defaultRecipient);
     const [ amount, setAmount ] = useState("");
@@ -40,6 +41,10 @@ export default function Transfer() {
                 remark: remark })
         })
         .then(response => {
+            if (response.status === 401) {
+                router.replace('/login');
+                return;
+            }
             return response.json().then(result => {
                 if (!response.ok) {
                     throw new Error(result.error);

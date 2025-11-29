@@ -1,3 +1,11 @@
+
+.buttonGroup {
+  display: flex;
+  justify-content: flex-end; /* align buttons to the right */
+  gap: 10px;                 /* spacing between buttons */
+  margin-top: 20px;          /* space from content above */
+}
+
 .container {
   min-height: calc(100vh - 120px);
   height: 100%;
