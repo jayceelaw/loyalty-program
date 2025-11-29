@@ -17,6 +17,7 @@ const types = {
     new: "string",
     type: "string",
     spent: "number",
+    promotionId: "number",
     promotionIds: "array",
     remark: "string",
     startTime: "datetime",
