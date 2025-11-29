@@ -17,9 +17,8 @@ export default function RegisterPage() {
   }, [initializing])
 
   return (
-    <div className='main-container'>
-         {currentInterface === 'manager' || currentInterface === 'superuser' ? <RegisterForm /> : 
-        currentInterface ? "403 Forbidden" : <div className='spinner'></div>}
-    </div>
+     currentInterface === 'manager' || currentInterface === 'superuser' ? <RegisterForm /> : 
+    currentInterface ? <div className='main-container'>403 Forbidden</div>: <div className='spinner'></div>
+
   );
 }
