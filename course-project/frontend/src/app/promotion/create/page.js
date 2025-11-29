@@ -39,7 +39,8 @@ export default function CreatePromotion() {
             }
             const createPromotion = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
             const response = await createPromotion.json(); // returns promise so need await
@@ -148,7 +149,6 @@ export default function CreatePromotion() {
             </div>
 
             <div className={styles.footer}>
-                <FeedBackMessage error={error} message={message}/>
                 <PrimaryButton
                     className="submit"
                     text="Create"
@@ -157,7 +157,7 @@ export default function CreatePromotion() {
                         handleSend();
                     }}
                 />
-   
+                <FeedBackMessage error={error} message={message}/>
             </div>
         </div>
     );

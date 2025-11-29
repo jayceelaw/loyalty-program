@@ -55,6 +55,11 @@ router.post('/tokens', async (req, res) => {
         where: { utorid: utorid }
     })
 
+    res.cookie("jwt_token", token, {
+        httpOnly: true,
+        sameSite: "lax"
+    });
+
     res.json({
         token,
         expiresAt: (new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).toISOString()
@@ -160,6 +165,11 @@ router.post('/resets/:resetToken', async (req, res) => {
     });
 
     res.status(200).send({ message: "reset password successfully" });
+});
+
+router.post('/logout', async (req, res) => {
+    res.clearCookie("jwt_token");
+    res.send({ message: "logged out successfully" });
 });
 
 module.exports = router;

@@ -52,12 +52,13 @@ export default function CreateEvent() {
 
         try {
             setSubmitting(true);
-            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-            if (!token) { setError(true); setMessage('Not logged in'); return; }
+            // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            // if (!token) { setError(true); setMessage('Not logged in'); return; }
 
             const res = await fetch(`${backend}/events`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
             let body;

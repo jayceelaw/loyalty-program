@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
@@ -29,40 +29,39 @@ export default function AwardGuestPage() {
     const showNotification = (message, type) => setNotification({ isVisible: true, message, type });
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
-    // Fetch event 
-    const fetchEvent = useCallback(async (eventId) => {
-        if (!eventId) return;
-        setLoading(true);
-        setError('');
-
-        try {
-            const res = await fetch(`${backendURL}/events/${eventId}`, {
-                headers: { Authorization: `Bearer ${token}`, },
-            });
-            if (!res.ok) {
-                const { error } = await res.json();
-                setEvent(null);
-                throw new Error(error || 'Failed to fetch event');
-            }
-            const data = await res.json();
-            setEvent(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [token, backendURL, setEvent, setLoading, setError]); // rerun fetch if these changes
-
-     // fetch event, run when current EventId or fetch eevnt or user changes
     useEffect(() => {
-        if (currentEventId && user) {
-            fetchEvent(currentEventId);
-        } else {
-            setLoading(false); 
+        if (!currentEventId || !user) {
+            setLoading(false);
             setEvent(null);
             setError('');
+            return;
         }
-    }, [currentEventId, user, fetchEvent]);
+        // Fetch event 
+        const fetchEvent = async () => {
+            setLoading(true);
+            setError('');
+
+            try {
+                const res = await fetch(`${backendURL}/events/${currentEventId}`, {
+                    credentials: 'include'
+                });
+                if (!res.ok) {
+                    const { error } = await res.json();
+                    setEvent(null);
+                    throw new Error(error || 'Failed to fetch event');
+                }
+                const data = await res.json();
+                setEvent(data);
+            } catch (err) {
+                setError(err.message); // save err message so it can be rendered later
+                showNotification(err.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchEvent();
+    }, [currentEventId, user, token]); // rerun if these changes 
 
     // Award points
     const handleAwardPoints = async () => {
@@ -93,7 +92,8 @@ export default function AwardGuestPage() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    // 'Authorization': `Bearer ${token}`,
+                    credentials: 'include'
                 },
                 body: JSON.stringify(payload),
             });
@@ -116,8 +116,8 @@ export default function AwardGuestPage() {
                 setUtorid('');
                 setAmount('');
                 setRemark('');
-                setCurrentEventId(''); 
-                setEvent(null); 
+                setCurrentEventId('');
+                setEvent(null);
             } else {
                 showNotification(`Error: ${data.error || 'Failed to award points.'}`, 'error');
             }
@@ -130,16 +130,14 @@ export default function AwardGuestPage() {
 
     const displayPoints = event?.pointsRemain || 0;
     const isFormDisabled = !event || loading || isSubmitting;
+
     // button
-    const buttonText =
-        utorid.trim() === ''
-            ? `Award ${amount || 0} Points to All Guests`
-            : `Award ${amount || 0} to ${utorid.trim()}`;
+    const buttonText = utorid.trim() === '' ? `Award ${amount || 0} Points to All Guests` : `Award ${amount || 0} to ${utorid.trim()}`;
 
     return (
         <main className={styles.container}>
             <div className={styles.awardPointsWrapper}>
-                <h1>Award Points</h1> 
+                <h1>Award Points</h1>
                 <p className={styles.pointsStatus}>
                     Total Points Remaining: {displayPoints}
                 </p>

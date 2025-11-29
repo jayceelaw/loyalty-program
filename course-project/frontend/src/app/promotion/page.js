@@ -40,11 +40,12 @@ export default function PromotionsPage() {
     setLoading(true);
     setErr(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (!token) throw new Error('Not logged in');
+    //   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    //   if (!token) throw new Error('Not logged in');
 
       const res = await fetch(`${backend}/promotions`, {
-        headers: { Authorization: `Bearer ${token}` }
+        // headers: { Authorization: `Bearer ${token}` }
+        credentials: 'include'
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -130,8 +131,8 @@ export default function PromotionsPage() {
 
   const handleDelete = async (id) => {
     if (!backend) return;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) { console.warn('[Delete] no token'); return; }
+    // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    // if (!token) { console.warn('[Delete] no token'); return; }
     if (!['manager','superuser'].includes(currentInterface)) {
       console.warn('[Delete] interface not allowed:', currentInterface);
       return;
@@ -143,7 +144,8 @@ export default function PromotionsPage() {
       console.log('[Delete] DELETE', url);
       const res = await fetch(url, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        // headers: { Authorization: `Bearer ${token}` }
+        credentials: 'include'
       });
 
       if (res.status === 204) {

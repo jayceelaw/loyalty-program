@@ -58,10 +58,11 @@ export default function UserView() {
 
         const res = await fetch(`/users?${params}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {})
-            }
+            // headers: {
+            //     'Content-Type': 'application/json',
+            //     ...(token ? { Authorization: `Bearer ${token}` } : {})
+            // }
+            credentials: 'include'
         });
         const data = await res.json();
 

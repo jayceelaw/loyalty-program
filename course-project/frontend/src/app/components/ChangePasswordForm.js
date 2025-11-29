@@ -22,8 +22,9 @@ export default function ChangePasswordForm() {
         const res = await fetch('/users/me', {
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-          }
+            // ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
+          credentials: 'include'
         });
         if (!res.ok) return;
         const data = await res.json();
@@ -53,8 +54,9 @@ export default function ChangePasswordForm() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        //   ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
+        credentials: 'include',
         body: JSON.stringify({
           old: hasPassword ? currentPassword : '',
           new: newPassword

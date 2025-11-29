@@ -49,9 +49,10 @@ export default function Purchase() {
         }));       
 
         fetch(`/transactions`, {
-            headers: { 'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'},
+            // headers: { 'Authorization': `Bearer ${token}`,
+            //             'Content-Type': 'application/json'},
             method: "POST",
+            credentials: 'include',
             body: JSON.stringify(relevantOptions)
         })
         .then(response => {

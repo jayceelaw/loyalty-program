@@ -38,7 +38,8 @@ export default function EventsListPage() {
 
     try {
       const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        // headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to load events');
@@ -80,6 +81,7 @@ export default function EventsListPage() {
       <h1>Events</h1>
       <EventFilter/>
       <div ref={scrollRef} onScroll={handleScroll} className={styles.infiniteScroll}>
+        {error && <p className={styles.error}>{errorMessage}</p>}
         {events.map((e, index) => (
           <EventCard
             key={e.id}

@@ -16,7 +16,8 @@ export default function RegularUserPage() {
     if (!user) return;
 
     fetch(`${backendURL}/users/me/transactions?limit=5`, { // Display recent transactions, assume 5 for now
-      headers: { Authorization: `Bearer ${token}` },
+    //   headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
     })
       .then((res) => res.json())
       .then((data) => setTransactions(data.results));

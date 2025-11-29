@@ -12,7 +12,6 @@ export default function EventDetailPage() {
     const { user, token } = useAuth();
     const searchParams = useSearchParams();
     const id = searchParams.get('eventId');
-
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -28,7 +27,8 @@ export default function EventDetailPage() {
     const checkRsvpStatus = async () => {
         try {
             const res = await fetch(`${backendURL}/events/${id}/guests/me`, {
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
             const data = await res.json();
             if (res.ok && data.hasRSVP) {
@@ -46,7 +46,8 @@ export default function EventDetailPage() {
     const fetchEvent = async () => {
         try {
             const res = await fetch(`${backendURL}/events/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
             const data = await res.json();
             if (!res.ok) throw new Error('Failed to load event');
@@ -68,15 +69,16 @@ export default function EventDetailPage() {
         setLoading(true); 
         fetchEvent();
         checkRsvpStatus();
-    }, [id, user?.id, token]); // Rerun if event or user or token changes  
-
+    }, [id, token]); // Rerun if eventid or token changes
+    
     // RSVP  
     const handleRSVP = async () => {
         try {
             setLoading(true);
             const res = await fetch(`${backendURL}/events/${id}/guests/me`, {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
 
             const data = await res.json();
