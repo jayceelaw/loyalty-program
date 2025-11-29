@@ -65,9 +65,9 @@ export default function ManagerDashboardPage() {
       try {
         const [eventsRes, promosRes, usersRes] = await Promise.all([
           // backend filters out full events 
-          fetch(`${backendURL}/events?showFull=true`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${backendURL}/promotions`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${backendURL}/users`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${backendURL}/events?showFull=true`, { credentials: 'include' }),
+          fetch(`${backendURL}/promotions`, { credentials: 'include' }),
+          fetch(`${backendURL}/users`, { credentials: 'include' }),
         ]);
 
         const [events, promos, users] = await Promise.all([

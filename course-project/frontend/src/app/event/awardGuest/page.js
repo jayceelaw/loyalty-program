@@ -43,7 +43,7 @@ export default function AwardGuestPage() {
 
             try {
                 const res = await fetch(`${backendURL}/events/${currentEventId}`, {
-                    headers: { Authorization: `Bearer ${token}`, },
+                    credentials: 'include'
                 });
                 if (!res.ok) {
                     const { error } = await res.json();
@@ -92,7 +92,8 @@ export default function AwardGuestPage() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    // 'Authorization': `Bearer ${token}`,
+                    credentials: 'include'
                 },
                 body: JSON.stringify(payload),
             });

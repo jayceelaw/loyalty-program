@@ -27,7 +27,8 @@ export default function EventDetailPage() {
     const checkRsvpStatus = async () => {
         try {
             const res = await fetch(`${backendURL}/events/${id}/guests/me`, {
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
             const data = await res.json();
             if (res.ok && data.hasRSVP) {
@@ -45,7 +46,8 @@ export default function EventDetailPage() {
     const fetchEvent = async () => {
         try {
             const res = await fetch(`${backendURL}/events/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
             const data = await res.json();
             if (!res.ok) throw new Error('Failed to load event');
@@ -75,7 +77,8 @@ export default function EventDetailPage() {
             setLoading(true);
             const res = await fetch(`${backendURL}/events/${id}/guests/me`, {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
 
             const data = await res.json();

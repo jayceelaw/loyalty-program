@@ -25,10 +25,11 @@ export default function EditProfileForm() {
     async function fetchMe() {
       try {
         const res = await fetch('/users/me', {
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-          }
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     ...(token ? { Authorization: `Bearer ${token}` } : {})
+        //   },
+          credentials: 'include'
         });
         if (!res.ok) return;
         const data = await res.json();
@@ -81,9 +82,10 @@ export default function EditProfileForm() {
         if (birthday) fd.append('birthday', birthday);
         res = await fetch('/users/me', {
           method: 'PATCH',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-          },
+        //   headers: {
+        //     ...(token ? { Authorization: `Bearer ${token}` } : {})
+        //   },
+          credentials: 'include',
           body: fd
         });
       } else {

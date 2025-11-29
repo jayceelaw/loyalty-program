@@ -48,7 +48,8 @@ export default function TransactionsListPage() {
     url.search = new URLSearchParams(relevantFilters).toString();
 
     fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    //   headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
     })
     .then(response => {
       return response.json().then(result => {
@@ -80,7 +81,8 @@ export default function TransactionsListPage() {
     url.search = new URLSearchParams(relevantFilters).toString();
 
     fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    //   headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include'
     })
     .then(response => {
       return response.json().then(result => {

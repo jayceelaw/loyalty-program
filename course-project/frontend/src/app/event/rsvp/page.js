@@ -27,7 +27,8 @@ export default function RsvpPage() {
         } 
         try {
             const res = await fetch(`${backendURL}/events/${currentEventId}/guests/me`, {
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
             const data = await res.json();
             if (res.ok && data.hasRSVP) {
@@ -63,7 +64,8 @@ export default function RsvpPage() {
 
             const res = await fetch(`${backendURL}/events/${eventId}/guests/me`, {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include'
             });
 
             const data = await res.json();

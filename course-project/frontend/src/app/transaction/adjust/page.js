@@ -33,8 +33,9 @@ export default function Adjust() {
     useEffect(() =>{
         if (!token) return;
          fetch(`/transactions/${transactionId}`, {
-            headers: { 'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'},
+            // headers: { 'Authorization': `Bearer ${token}`,
+            //             'Content-Type': 'application/json'},
+            credentials: 'include'
         })
         .then(response => {
             if (response.status === 401) {
@@ -83,9 +84,10 @@ export default function Adjust() {
         }));       
 
         fetch(`/transactions`, {
-            headers: { 'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'},
+            // headers: { 'Authorization': `Bearer ${token}`,
+            //             'Content-Type': 'application/json'},
             method: "POST",
+            credentials: 'include',
             body: JSON.stringify(relevantOptions)
         })
         .then(response => {

@@ -39,7 +39,8 @@ export default function CreatePromotion() {
             }
             const createPromotion = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
             const response = await createPromotion.json(); // returns promise so need await

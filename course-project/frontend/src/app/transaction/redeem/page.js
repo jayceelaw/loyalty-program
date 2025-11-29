@@ -29,9 +29,10 @@ export default function Redeem() {
         setMessage("");
 
         fetch(`/users/me/transactions`, {
-            headers: { 'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'},
+            // headers: { 'Authorization': `Bearer ${token}`,
+            //             'Content-Type': 'application/json'},
             method: "POST",
+            credentials: 'include',
             body: JSON.stringify({ 
                 type: "redemption",
                 amount: Number(amount),

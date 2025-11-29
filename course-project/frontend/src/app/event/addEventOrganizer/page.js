@@ -33,7 +33,8 @@ export default function AddEventOrganizer() {
         setError('');
         try {
             const res = await fetch(`${backendURL}/events/${eventId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                credentials: 'include'
             });
             if (!res.ok) {
                 let body = {};
@@ -100,7 +101,8 @@ export default function AddEventOrganizer() {
                 `${backendURL}/events/${currentEventId}/organizers/${selectedUserId}`,
                 {
                     method: 'DELETE',
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    credentials: 'include'
                 }
             );
             if (res.ok) {

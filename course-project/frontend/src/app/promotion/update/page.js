@@ -50,7 +50,7 @@ export default function UpdatePromotion() {
 
       // get promotion information to adjust
       const url = `/promotions/${idNum}`;
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(url, { credentials: 'include' } );
       const body = await res.json();
 
       if (!res.ok) 
@@ -109,7 +109,8 @@ export default function UpdatePromotion() {
 
       const res = await fetch(url, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: JSON.stringify(relevantOptions)
       });
 

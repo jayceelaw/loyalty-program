@@ -20,29 +20,28 @@ export function AuthProvider({ children }) {
   const interfaces = ["regular", "cashier", "manager", "superuser", "organizer"]
   const [currentInterface, setCurrentInterface] = useState(null);
 
-  useEffect(() => {
-    setInitializing(true);
-    const token = localStorage.getItem("token");
-    
-    if (!token) { 
-        setUser(null);
-        setCurrentInterface(null);
-        setInitializing(false);
-    } else {
-        setToken(token);
-
+    useEffect(() => {
+        setInitializing(true);
+        setToken(1);
         fetch('/users/me', {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` },
+            // headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'include'
         })
-        .then((data) => data.json())
-        .then((data) => {
+        .then(res => {
+            if (!res.ok) throw new Error('Not logged in');
+            return res.json();
+        })
+        .then(data => {
             setUser(data);
             setCurrentInterface(data.role);
         })
+        .catch(() => {
+            setUser(null);
+            setCurrentInterface(null);
+        })
         .finally(() => setInitializing(false));
-    }
-  }, [])
+    }, []);
 
   const login = async (utorid, password) => {
     const res = await fetch('/auth/tokens', {
@@ -58,11 +57,12 @@ export function AuthProvider({ children }) {
     }
 
     setToken(data.token);
-    localStorage.setItem('token', data.token);
+    // localStorage.setItem('token', data.token);
 
     fetch('/users/me', {
       method: 'GET',
-      headers: { 'Authorization': `Bearer ${data.token}` }
+      credentials: 'include'
+    //   headers: { 'Authorization': `Bearer ${data.token}` }
     })
     .then((data) => data.json())
     .then(userData => {
@@ -76,7 +76,8 @@ export function AuthProvider({ children }) {
   const loadUser = () => {
      fetch('/users/me', {
       method: 'GET',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+    //   headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+      credentials: 'include'
     })
     .then((data) => data.json())
     .then(data => {
@@ -85,13 +86,18 @@ export function AuthProvider({ children }) {
     });
   }
 
-  const logout = () => {
-      localStorage.removeItem("token");
-      setCurrentInterface(null);
-      setToken(null);
-      setUser(null);
+  const logout = async () => {
+    //   localStorage.removeItem("token");
+    fetch('/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
 
-      router.push("/");
+    setCurrentInterface(null);
+    setToken(null);
+    setUser(null);
+
+    router.push("/");
   };
 
   return (

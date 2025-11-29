@@ -37,7 +37,7 @@ export default function AddGuestsPage() {
             setError('');
             try {
                 const res = await fetch(`${backendURL}/events/${currentEventId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                    credentials: 'include',
                 });
                 if (!res.ok) {
                     const { error } = await res.json();
@@ -68,10 +68,11 @@ export default function AddGuestsPage() {
         try {
             const res = await fetch(`${backendURL}/events/${currentEventId}/guests`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
+                // headers: {
+                //     'Content-Type': 'application/json',
+                //     Authorization: `Bearer ${token}`,
+                // },
+                credentials: 'include',
                 body: JSON.stringify({ utorid: newGuestUtorid.trim() }),
             });
 
@@ -99,7 +100,8 @@ export default function AddGuestsPage() {
                 `${backendURL}/events/${currentEventId}/guests/${selectedUserId}`,
                 {
                     method: 'DELETE',
-                    headers: { Authorization: `Bearer ${token}` },
+                    // headers: { Authorization: `Bearer ${token}` },
+                    credentials: 'include'
                 }
             );
             if (res.ok) {

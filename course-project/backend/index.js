@@ -22,11 +22,14 @@ const port = process.env.PORT || (() => {
 })();
 
 const express = require("express");
-const path = require('path');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+
 const app = express();
+const path = require('path');
 
 app.use(express.json());
+app.use(cookieParser());
 
 // connect to frontend
 app.use(cors({ origin: FRONTEND_URL,

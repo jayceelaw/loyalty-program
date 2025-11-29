@@ -39,10 +39,11 @@ export default function RegisterForm() {
 		try {
 			const res = await fetch('/users', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					...(token ? { Authorization: `Bearer ${token}` } : {})
-				},
+				// headers: {
+				// 	'Content-Type': 'application/json',
+				// 	...(token ? { Authorization: `Bearer ${token}` } : {})
+				// },
+                credentials: 'include',
 				body: JSON.stringify({
 					utorid: utorid.trim(),
 					name: fullName.trim(),

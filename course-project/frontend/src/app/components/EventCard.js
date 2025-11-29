@@ -21,15 +21,16 @@ export default function EventCard({
 
   const handleDelete = async () => {
     if (!backendURL) return;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) { console.warn('[Delete] no token'); return; }
+    // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    // if (!token) { console.warn('[Delete] no token'); return; }
     if (!window.confirm(`Delete event #${id}?`)) return;
 
     try {
       const url = `${backendURL}/events/${id}`;
       const res = await fetch(url, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        // headers: { Authorization: `Bearer ${token}` }
+        credentials: 'include'
       });
 
       if (res.status === 204) {
