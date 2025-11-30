@@ -1,13 +1,14 @@
 'use client';
 import { PrimaryButton } from "@/app/components/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
+import { useRouter } from "next/navigation";
 
 export default function UpdatePromotion() {
   // get token
-  const { token } = useAuth();
+  const { initializing, user } = useAuth();
 
   // Promotion id
   const [promotionId, setPromotionId] = useState('');
@@ -29,6 +30,15 @@ export default function UpdatePromotion() {
 
   // original promotion information
   const [original, setOriginal] = useState(null);
+
+  const router = useRouter();
+
+  // redirect unsigned user
+  useEffect(() => {
+      if (!initializing && !user) {
+      router.replace('/login');
+      }
+  }, [initializing])
 
   async function loadPromotion() {
     // check if loading, double click doesn't do anything

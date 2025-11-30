@@ -1,12 +1,13 @@
 'use client';
 import { PrimaryButton } from "@/app/components/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
+import { useRouter } from "next/navigation";
 
 export default function CreatePromotion() {
-    const { token } = useAuth();
+    const { token, initializing, user } = useAuth();
     
     const [promotionName, setPromotionName] = useState("");
     const [description, setDescription] = useState("");
@@ -22,6 +23,14 @@ export default function CreatePromotion() {
     const [error, setError] = useState(false);
 
     const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const router = useRouter();
+
+    // redirect unsigned user
+    useEffect(() => {
+        if (!initializing && !user) {
+        router.replace('/login');
+        }
+    }, [initializing])
 
     async function handleSend() {
         setMessage("");
