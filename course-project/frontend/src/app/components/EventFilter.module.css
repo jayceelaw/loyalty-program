@@ -6,8 +6,8 @@
     align-items: center;
     width: 95%;
     scrollbar-width: none;
-    padding-bottom: 4px;
-    margin-top: 8px;
+    padding-top: 12px; 
+    padding-bottom: 12px; 
 }
 
 
