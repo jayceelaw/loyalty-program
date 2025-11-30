@@ -370,3 +370,52 @@
     flex-direction: column;
     gap: 16px;
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+    min-height: calc(100vh - 80px);
+  }
+  .subContainer {
+    padding: 10px;
+    margin-top: 16px;
+    width: 98vw;
+    height: auto;
+    border-radius: 18px;
+  }
+  .form, .createForm {
+    width: 98vw;
+    min-width: 0;
+    height: auto;
+    padding-bottom: 0;
+    gap: 12px;
+  }
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 6px;
+  }
+  .column {
+    gap: 10px;
+  }
+  .fullWidthInput {
+    gap: 6px;
+  }
+  .input, .dropdown, .awardInputField, .textarea {
+    font-size: 15px;
+    padding: 10px;
+    min-height: 28px;
+    border-radius: 6px;
+  }
+  .submit, .back, .awardButton {
+    font-size: 15px;
+    padding: 10px 16px;
+    margin-top: 12px;
+  }
+  .message {
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+}
