@@ -20,7 +20,7 @@ export default function CashierDashboardPage() {
   return (
     <div className={styles.pageContainer}>
       <main className={cardClassName}>
-        <h2 className={styles.welcome}>Welcome, {user.name}!</h2>
+        <h2 className={styles.welcome}>Welcome, {user?.name}!</h2>
         <div className={styles.buttons}>
           <button className={styles.transaction + ' ' + styles.purchase}
             onClick={() => router.push("/transaction/purchase")}>Create Purchase Transaction</button>

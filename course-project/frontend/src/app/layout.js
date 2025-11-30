@@ -1,8 +1,10 @@
 import NavBar from './components/CondNavBar'
+import { Suspense } from "react";
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '../context/AuthContext';
 import { NotificationProvider } from '@/context/NotificationContext';
+import SuspenseWrapper from './SuspenseWrapper';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,7 +20,9 @@ export default function RootLayout({ children }) {
         <AuthProvider>
             <NotificationProvider>
               <NavBar/>
-              {children}
+              <SuspenseWrapper>
+                {children}
+              </SuspenseWrapper>
             </NotificationProvider>
         </AuthProvider>
       </body>
