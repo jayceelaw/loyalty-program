@@ -9,7 +9,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 export default function EventsListPage() {
   const PAGELIMIT = 5;
   const router = useRouter();
-  const { user, token, initializing } = useAuth();
+  const { user, initializing } = useAuth();
   const [events, setEvents] = useState([]);
   const [page, setPage] = useState(1);
   const [end, setEnd] = useState(false);
@@ -22,14 +22,12 @@ export default function EventsListPage() {
   const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
-    if (!initializing && !token) {
+    if (!initializing && !user) {
       router.replace('/login');
     }
   }, [initializing])
 
   const loadData = async (specificPage = 1) => {
-    if (!token) return; 
-
     setLoading(true);
     const url = new URL(backendURL + '/events');
 
@@ -72,7 +70,7 @@ export default function EventsListPage() {
     setErrorMessage('');
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
     loadData(1);
-  }, [searchParams, token]);
+  }, [searchParams]);
 
   const handleScroll = (e) => {
     const bottomReached = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < 50;

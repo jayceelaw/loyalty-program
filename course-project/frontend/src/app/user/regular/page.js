@@ -11,11 +11,11 @@ const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000
 
 export default function RegularUserPage() {
   const router = useRouter();
-  const { user, token, initializing } = useAuth();
+  const { user, initializing } = useAuth();
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    if (!initializing && !token) {
+    if (!initializing && !user) {
       router.replace('/login');
     }
   }, [initializing]);

@@ -9,7 +9,7 @@ import styles from '../event.module.css';
 
 export default function EventDetailPage() {
     const router = useRouter();
-    const { user, token, initializing } = useAuth();
+    const { user, initializing } = useAuth();
     const searchParams = useSearchParams();
     const id = searchParams.get('eventId');
     const [event, setEvent] = useState(null);
@@ -24,7 +24,7 @@ export default function EventDetailPage() {
     const closeNotification = () => {setNotification(prev => ({ ...prev, isVisible: false }));};
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing]);
@@ -75,7 +75,7 @@ export default function EventDetailPage() {
         setLoading(true); 
         fetchEvent();
         checkRsvpStatus();
-    }, [id, token]); // Rerun if eventid or token changes
+    }, [id]); // Rerun if eventid changes
     
     // RSVP  
     const handleRSVP = async () => {

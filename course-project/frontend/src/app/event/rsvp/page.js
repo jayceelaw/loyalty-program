@@ -8,7 +8,7 @@ import Notification from '../../components/Notification';
 import styles from '../event.module.css';
 
 export default function RsvpPage() {
-    const { user, token, initializing } = useAuth();
+    const { user, initializing } = useAuth();
     const router = useRouter();
     const [eventId, setEventId] = useState('');
     const [loading, setLoading] = useState(false);
@@ -21,14 +21,14 @@ export default function RsvpPage() {
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing]);
 
     // Check if already RSVP
     const checkRsvpStatus = async (currentEventId) => {
-        if (!currentEventId || !token) {
+        if (!currentEventId) {
             setIsRsvped(false);
             return;
         } 
@@ -56,7 +56,7 @@ export default function RsvpPage() {
         } else {
             setIsRsvped(false)
         }
-    }, [eventId, token]);
+    }, [eventId]);
 
     // RSVP Function 
     const handleRSVP = async () => {

@@ -7,10 +7,10 @@ import { useEffect } from "react";
 
 export default function CashierDashboardPage() {
   const router = useRouter();
-  const { user, token, initializing } = useAuth();
+  const { user, initializing } = useAuth();
 
   useEffect(() => {
-    if (!initializing && !token) {
+    if (!initializing && !user) {
       router.replace('/login');
     }
   }, [initializing]);

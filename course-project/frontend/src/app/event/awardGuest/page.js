@@ -13,7 +13,7 @@ export default function AwardGuestPage() {
     const { notify } = useNotification();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user, token, initializing } = useAuth();
+    const { user, initializing } = useAuth();
     const [currentEventId, setCurrentEventId] = useState(searchParams.get('eventId') || '');
     const [utorid, setUtorid] = useState('');
     const [amount, setAmount] = useState('');
@@ -29,7 +29,7 @@ export default function AwardGuestPage() {
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing]);
@@ -66,7 +66,7 @@ export default function AwardGuestPage() {
         };
         
         fetchEvent();
-    }, [currentEventId, user, token]); // rerun if these changes 
+    }, [currentEventId, user]); // rerun if these changes 
 
     // Award points
     const handleAwardPoints = async () => {

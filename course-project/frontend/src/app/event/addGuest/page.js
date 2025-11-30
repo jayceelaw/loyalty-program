@@ -9,7 +9,7 @@ import styles from '../event.module.css';
 
 export default function AddGuestsPage() {
     const searchParams = useSearchParams()
-    const { user, token, initializing } = useAuth();
+    const { user, initializing } = useAuth();
     const router = useRouter();
     const initialEventId = searchParams.get('eventId') || '';
     const [currentEventId, setCurrentEventId] = useState(initialEventId);
@@ -26,7 +26,7 @@ export default function AddGuestsPage() {
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
     useEffect(() => {
-        if (!initializing && !token) {
+        if (!initializing && !user) {
             router.replace('/login');
         }
     }, [initializing]);
@@ -62,7 +62,7 @@ export default function AddGuestsPage() {
         };
 
         fetchEvent();
-    }, [currentEventId, token]); // run this when currentEventId changes 
+    }, [currentEventId]); // run this when currentEventId changes 
 
     // role
     const isManagerOrSuperuser = ['manager', 'superuser'].includes(user?.role);
@@ -76,8 +76,7 @@ export default function AddGuestsPage() {
             const res = await fetch(`${backendURL}/events/${currentEventId}/guests`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    // Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 },
                 credentials: 'include',
                 body: JSON.stringify({ utorid: newGuestUtorid.trim() }),

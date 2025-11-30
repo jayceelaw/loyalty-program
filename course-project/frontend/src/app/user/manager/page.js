@@ -50,10 +50,10 @@ function getEventsPerMonth(events) {
 
 export default function ManagerDashboardPage() {
   const router = useRouter();
-  const { user, token, initializing } = useAuth();
+  const { user, initializing } = useAuth();
 
   useEffect(() => {
-    if (!initializing && !token) {
+    if (!initializing && !user) {
       router.replace('/login');
     }
   }, [initializing]);
