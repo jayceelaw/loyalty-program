@@ -76,7 +76,7 @@ export default function RegisterPage() {
 	const canSubmit = Boolean(utorid.trim() && fullName.trim() && email.trim());
 
   return (
-     currentInterface === 'manager' || currentInterface === 'superuser' ? (
+     currentInterface !== 'regular' ? (
 		<div className={styles.container} style={{ '--primary': colors.primary }}>
 			<div className={styles.card}>
 				<h1 className={styles.title}>Register New User</h1>
