@@ -35,6 +35,7 @@ export default function UpdatePromotion() {
     // check if loading, double click doesn't do anything
     if(loading) return;
 
+    setLoading(true);
     setMessage(''); 
     setError(false);
 
@@ -74,53 +75,56 @@ export default function UpdatePromotion() {
   // update promotion information
   async function handleSend() {
     if(loading) return;
-
     setMessage(''); 
     setError(false);
-    
-    // get promotion id 
     const idNum = Number(promotionId);
-    if (!Number.isInteger(idNum)) 
-      { setError(true); 
-        setMessage('Valid numeric ID required'); 
-        return; }
-
+    if (!Number.isInteger(idNum)) {
+      setError(true);
+      setMessage('Valid numeric ID required');
+      return;
+    }
+    // Normalize type and convert dates
+    const normalizedType = type === 'one-time' ? 'onetime' : (type || undefined);
+    const toISO = (dt) => dt ? new Date(dt).toISOString() : undefined;
     const options = {
       id: idNum,
       name: promotionName,
       description: description,
-      type: type,
-      startTime: startTime,
-      endTime: endTime,
-      minSpending: minimumSpend,
-      rate: rate,
-      points: points
-    }
+      type: normalizedType,
+      startTime: toISO(startTime),
+      endTime: toISO(endTime),
+      minSpending: minimumSpend === '' ? undefined : Number(minimumSpend),
+      rate: rate === '' ? undefined : Number(rate),
+      points: points === '' ? undefined : Number(points)
+    };
 
-    // convert object -> array of key-value pairs to filter out entries that are empty strings then back to object
-    const relevantOptions = Object.fromEntries(Object.entries(options).filter(([k, v]) => {
-        return v !== '';
-    }));  
-    
-
+    // object to key value pair to filter for only relevant options, back to object
+    const relevantOptions = Object.fromEntries(Object.entries(options).filter(([k, v]) => v !== '' && v !== undefined));
     try {
       setLoading(true);
       const url = `/promotions/${idNum}`;
-
       const res = await fetch(url, {
         method: 'PATCH',
-        // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         credentials: 'include',
         body: JSON.stringify(relevantOptions)
       });
-
       const body = await res.json();
       if (!res.ok) throw new Error(body.error);
       setMessage('Update Promotion Successful!');
       setError(false);
-
+      setPromotionName('');
+      setDescription('');
+      setType('');
+      setStartTime('');
+      setEndTime('');
+      setMinimumSpend('');
+      setRate('');
+      setPoints('');
     } catch (e) {
-      setError(true); 
+      setError(true);
       setMessage(e.message);
     } finally {
       setLoading(false);
