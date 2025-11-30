@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken'); 
 require('dotenv').config(); 
 const JWT_SECRET = process.env.JWT_SECRET; 
-
+const PAGELIMIT = 5;
 // connected clients
 const clients = new Map();
 
@@ -89,14 +89,10 @@ function initWebSocket(server) {
       clients.set(utorid, ws);
       console.log(`${utorid} connected via WebSocket`);
     }
-
-    // get pending notifications from when the user was offline
-    const pending = await retrieveNotifications(utorid);
-    pending.map((notification) => ws.send(JSON.stringify(notification)));    
-
+ 
     // user sends request
     ws.on("message", async (data) => {
-      const { utorid, message, clear, view, id } = JSON.parse(data);
+      const { utorid, message, clear, view, id, retrieve, page } = JSON.parse(data);
 
       // send message to another user
       if (message) {
@@ -123,6 +119,20 @@ function initWebSocket(server) {
 
       else if (view) {
           viewNotification(id);
+      }
+
+      else if (retrieve) {
+
+        // retrieve older notifications
+        const pending = await retrieveNotifications(ws.user.utorid, page, PAGELIMIT);
+        const end = (!pending || pending.length < PAGELIMIT);
+        pending.map((notification) =>{ 
+          notification.old = true; // append to end
+          ws.send(JSON.stringify(notification))
+        }); 
+
+        // signal end
+        if (end) ws.send(JSON.stringify({ end: true }));
       }
 
     });

@@ -32,12 +32,16 @@ const clearNotifications = async (utorid) => {
 
 }
 
-const retrieveNotifications = async (utorid) => {
+const retrieveNotifications = async (utorid, page, limit) => {
     try {
         const result = await prisma.notification.findMany({ 
-            where: { utorid: utorid }
+            where: { utorid: utorid },
+            take: limit,
+            skip: (page - 1) * limit,
+            orderBy: { time: 'desc'}
         });
         return result;
+        
     }
     catch (err) {
         console.log(err.message);

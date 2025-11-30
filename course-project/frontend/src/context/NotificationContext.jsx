@@ -13,6 +13,8 @@ export function NotificationProvider({children}) {
     const [ notifications, setNotifications ] = useState([]);
     const [ unseen, setUnseen ] = useState(0); // new unseen notifications
     const [ result, setResult ] = useState({error: false, message: ""});
+    const pageRef = useRef(1);
+    const [ end, setEnd ] = useState(false);
     const socketRef = useRef(null);
     const isConnectingRef = useRef(false);
     const reconnectTimeoutRef = useRef(null);
@@ -34,13 +36,26 @@ export function NotificationProvider({children}) {
             socket.onopen = () => {
                 setNotifications([]); // clear existing notifications (possibly from previous user)
                 setUnseen(0);
+                pageRef.current = 1;
+                setEnd(false);
+                retrieve(); // retrieve first page of notifications
+    
                 isConnectingRef.current = false;
             };
 
             // listen for real-time notifications
             socket.onmessage = (event) => {
-                setResult({});
+
                 const notification = JSON.parse(event.data);
+
+                // signal end of infinite scroll
+                if (notification.end) {
+                    setEnd(true);
+                    return;
+                }
+
+                 // feedback message from sending messages
+                setResult({});
                 if (notification.error) {
                     setResult({ error: true, message: notification.error });
                     return;
@@ -50,8 +65,18 @@ export function NotificationProvider({children}) {
                     return;
                 }
 
+                // unseen count
                 if (!notification.seen) setUnseen(prev => prev + 1);
-                setNotifications(prev => [notification, ...prev]);
+
+                // determine where to load notification (recent or old)
+                if (notification.old) {
+                    setNotifications(prev => [...prev, notification]);
+                }
+
+                else {
+                    setNotifications(prev => [notification, ...prev]);
+                }
+              
             };
 
             // error
@@ -105,11 +130,18 @@ export function NotificationProvider({children}) {
         socketRef.current.send(JSON.stringify({id: id, view: true}));
     }
 
+    const retrieve = () => {
+        socketRef.current.send(JSON.stringify({ retrieve: true, page: pageRef.current}))
+        pageRef.current++;
+    }
+
     return (
         <NotificationContext.Provider value={{
             notify,
             clear,
             view,
+            retrieve,
+            end,
             notifications,
             setNotifications,
             unseen,
