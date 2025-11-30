@@ -103,7 +103,7 @@ course-project/
 
 ### Production Deployment
 - **Backend**: Set NODE_ENV=production, use Postgres for DB, secure JWT_SECRET, and configure SendGrid.
-- **Frontend**: Build with `npm run build` and deploy static output (Vercel/Netlify or custom server).
+- **Frontend**: Build with `npm run build`.
 - **Environment variables** must be set in production (see below).
 
 ---
@@ -140,11 +140,4 @@ NEXT_PUBLIC_BACKEND_URL="http://localhost:4000"
 - Christina Huang ([HChristinaH](https://github.com/HChristinaH))
 - Jaycee Law ([jayceelaw](https://github.com/jayceelaw))
 - Kristen Lee ([kcltlee](https://github.com/kcltlee))
-
----
-
-## Troubleshooting
-- If frontend shows empty responses, confirm backend is running and URLs match.
-- Prisma errors: check DB provider compatibility (SQLite vs Postgres).
-- For DELETE, handle empty responses (204 No Content).
 
