@@ -19,7 +19,7 @@ export default function EventsListPage() {
   const scrollRef = useRef();
   const searchParams = useSearchParams();
   const filter = Object.fromEntries(searchParams.entries()); 
-  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
   useEffect(() => {
     if (!initializing && !user) {
