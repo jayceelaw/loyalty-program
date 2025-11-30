@@ -43,6 +43,10 @@ export default function PromotionsPage() {
 
   const [filtersVersion, setFiltersVersion] = useState(0); // force refetch trigger
 
+  // sorting
+  const [sortField, setSortField] = useState(''); // '', 'start', 'end'
+  const [sortDir, setSortDir] = useState('asc'); // 'asc' or 'desc'
+
 
   // useCallback memoizes the function - React keeps the same reference between renders unless dependencies change
   const fetchPromotions = useCallback(async (targetPage = 1, replace = false) => {
@@ -195,6 +199,23 @@ export default function PromotionsPage() {
       }
     };
 
+  // Sorting logic
+  const sortedPromotions = React.useMemo(() => {
+    if (!sortField) return promotions;
+    const sorted = [...promotions].sort((a, b) => {
+      let av, bv;
+      if (sortField === 'start') {
+        av = a.startTime ? new Date(a.startTime).getTime() : 0;
+        bv = b.startTime ? new Date(b.startTime).getTime() : 0;
+      } else {
+        av = a.endTime ? new Date(a.endTime).getTime() : 0;
+        bv = b.endTime ? new Date(b.endTime).getTime() : 0;
+      }
+      return sortDir === 'asc' ? av - bv : bv - av;
+    });
+    return sorted;
+  }, [promotions, sortField, sortDir]);
+
   return (
     <div className={styles.pageContainer}>
       <main>
@@ -286,13 +307,42 @@ export default function PromotionsPage() {
           </div>
         </div>
 
+        {/* Sorting button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 14 }}>Sort by:</span>
+          <button
+            type="button"
+            className={styles.searchBtn}
+            style={{ fontWeight: sortField === 'start' ? 'bold' : 'normal' }}
+            onClick={() => setSortField(f => f === 'start' ? '' : 'start')}
+          >
+            Start Date {sortField === 'start' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+          </button>
+          <button
+            type="button"
+            className={styles.searchBtn}
+            style={{ fontWeight: sortField === 'end' ? 'bold' : 'normal' }}
+            onClick={() => setSortField(f => f === 'end' ? '' : 'end')}
+          >
+            End Date {sortField === 'end' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+          </button>
+          <button
+            type="button"
+            className={styles.searchBtn}
+            onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+            disabled={!sortField}
+          >
+            {sortField ? (sortDir === 'asc' ? 'Asc' : 'Desc') : 'Asc/Desc'}
+          </button>
+        </div>
+
         <div className={styles.resultsContainer}>
           <div className={styles.resultsCard}>
             <div ref={scrollRef} className={styles.promotionList} onScroll={handleScroll}>
               {loading && <div>Loading…</div>}
               {error && <div style={{ color: 'red' }}>Error: {message}</div>}
-              {!loading && !error && promotions.length === 0 && <div>No promotions found</div>}
-              {!loading && !error && promotions.map((p) => (
+              {!loading && !error && sortedPromotions.length === 0 && <div>No promotions found</div>}
+              {!loading && !error && sortedPromotions.map((p) => (
                 <PromotionCard
                   key={p.id}
                   {...p}
@@ -300,7 +350,7 @@ export default function PromotionsPage() {
                   onDelete={handleDelete}
                 />
               ))}
-              {reachedEnd && promotions.length > 0 && (
+              {reachedEnd && sortedPromotions.length > 0 && (
                 <div style={{ padding: 8, opacity: 0.6 }} />
               )}
             </div>
