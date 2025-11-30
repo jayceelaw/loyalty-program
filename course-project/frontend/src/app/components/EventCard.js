@@ -69,6 +69,8 @@ export default function EventCard({
   )}&dates=${toGoogleCalendarDate(startTime)}/${toGoogleCalendarDate(
     endTime
   )}&details=${encodeURIComponent('Remember to RSVP to event!')}&location=${encodeURIComponent(location)}`;
+  
+  const googleMapsUrl = `https://maps.google.com/maps?q=${encodeURIComponent(location)}`;
 
   return (
     <div className={styles.container}>
@@ -78,7 +80,7 @@ export default function EventCard({
           <p>
             <span className={styles.label}>Location:</span>{' '}
             <a
-              href={`https://maps.google.com/?q=${encodeURIComponent(location)}`}
+              href={googleMapsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.mapLink}
