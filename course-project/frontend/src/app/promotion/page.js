@@ -41,9 +41,11 @@ export default function PromotionsPage() {
   const [appliedMinSpendMin, setAppliedMinSpendMin] = useState('');
   const [appliedPointsMin, setAppliedPointsMin] = useState('');
 
+  const [filtersVersion, setFiltersVersion] = useState(0); // force refetch trigger
+
 
   // useCallback memoizes the function - React keeps the same reference between renders unless dependencies change
-  const fetchPromotions = useCallback(async (targetPage = 1, replace = true) => {
+  const fetchPromotions = useCallback(async (targetPage = 1, replace = false) => {
     // Allow replace fetch even if a previous fetch is in-flight (avoid empty list on double Apply)
     if (loading && !replace) return;
 
@@ -70,12 +72,12 @@ export default function PromotionsPage() {
         list = list.filter(p => p.type === tf);
       }
       if (appliedStartAfter) {
-        const s = new Date(`${appliedStartAfter}T00:00`);
-        if (!isNaN(s)) list = list.filter(p => p.startTime && new Date(p.startTime) >= s);
+        const dayEnd = new Date(`${appliedStartAfter}T23:59:59.999`);
+        if (!isNaN(dayEnd)) list = list.filter(p => p.startTime && new Date(p.startTime) > dayEnd);
       }
       if (appliedEndBefore) {
-        const e = new Date(`${appliedEndBefore}T23:59:59.999`);
-        if (!isNaN(e)) list = list.filter(p => p.endTime && new Date(p.endTime) <= e);
+        const cutoffStart = new Date(`${appliedEndBefore}T00:00:00.000`);
+        if (!isNaN(cutoffStart)) list = list.filter(p => p.endTime && new Date(p.endTime) < cutoffStart);
       }
       if (appliedRateMin !== '') {
         const rMin = Number(appliedRateMin);
@@ -90,10 +92,15 @@ export default function PromotionsPage() {
         list = list.filter(p => p.points != null && Number(p.points) >= ptMin);
       }
 
-      // Pagination
       const startIdx = (targetPage - 1) * 10;
       const batch = list.slice(startIdx, startIdx + 10);
-      setPromotions(prev => replace ? batch : [...prev, ...batch]);
+      // De-dup when appending to avoid duplicate keys
+      setPromotions(prev => {
+        const base = replace ? [] : prev;
+        const seen = new Set(base.map(p => p.id));
+        const unique = batch.filter(p => !seen.has(p.id));
+        return replace ? unique : [...base, ...unique];
+      });
       if (batch.length < 10 || startIdx + 10 >= list.length) setReachedEnd(true);
       setPage(targetPage + 1);
     } catch (e) {
@@ -102,7 +109,7 @@ export default function PromotionsPage() {
     } finally {
       setLoading(false);
     }
-  }, [backendURL, token, typeFilter, appliedSearchTerm, appliedStartAfter, appliedEndBefore, appliedRateMin, appliedMinSpendMin, appliedPointsMin]);
+  }, [backendURL, token, typeFilter, appliedSearchTerm, appliedStartAfter, appliedEndBefore, appliedRateMin, appliedMinSpendMin, appliedPointsMin, loading]);
 
   const triggerSearch = () => {
     setAppliedSearchTerm(searchName.trim());
@@ -111,17 +118,13 @@ export default function PromotionsPage() {
     setAppliedRateMin(rateMin);
     setAppliedMinSpendMin(minSpendMin);
     setAppliedPointsMin(pointsMin);
-
-    // reset paging state
+    setPromotions([]);
     setPage(1);
     setReachedEnd(false);
-
-    // don’t clear list until new data arrives; show old results until replaced
-    fetchPromotions(1, true);
+    setFiltersVersion(v => v + 1); // ensure effect runs even if values identical
   };
 
   const clearFilters = () => {
-    // reset live inputs
     setSearchName('');
     setTypeFilter('');
     setStartAfter('');
@@ -130,36 +133,32 @@ export default function PromotionsPage() {
     setMinSpendMin('');
     setPointsMin('');
 
-    // reset committed filters
     setAppliedSearchTerm('');
     setAppliedStartAfter('');
     setAppliedEndBefore('');
     setAppliedRateMin('');
     setAppliedMinSpendMin('');
     setAppliedPointsMin('');
-
-    // reset paging and list, then fetch fresh
+    setPromotions([]);
     setPage(1);
     setReachedEnd(false);
-    fetchPromotions(1, true);
+    setFiltersVersion(v => v + 1);
+    fetchPromotions(1, true); // immediate refetch so one click clears
   };
 
-  // Initial load
+  // Refetch whenever any applied filter or type changes OR version increments
+  useEffect(() => {
+    if (!backendURL) return;
+    fetchPromotions(1, true);
+  }, [appliedSearchTerm, appliedStartAfter, appliedEndBefore, appliedRateMin, appliedMinSpendMin, appliedPointsMin, typeFilter, backendURL, filtersVersion]);
+
+  // Initial load only
   useEffect(() => {
     setPromotions([]);
     setPage(1);
     setReachedEnd(false);
     fetchPromotions(1, true);
   }, []); 
-
-  // Refetch when committed filters or type change
-  useEffect(() => {
-    setPromotions([]);
-    setPage(1);
-    setReachedEnd(false);
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-    fetchPromotions(1, true);
-  }, [fetchPromotions]);
 
   const handleScroll = (e) => {
     const t = e.target;
@@ -171,22 +170,25 @@ export default function PromotionsPage() {
 
   const handleDelete = async (id) => {
       if (!token) {return; }
+      if (!backendURL) { setError(true); setMessage('Missing backend URL'); return; }
       if (!window.confirm(`Delete promotion #${id}?`)) return;
-  
+
       try {
-        const url = `/promotions/${id}`;
+        const url = `${backendURL}/promotions/${id}`;
         const res = await fetch(url, {
           method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
           credentials: 'include'
         });
-  
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.error);
-  
+
+        if (res.status === 204) {
+          setPromotions(prev => prev.filter(p => p.id !== id));
+          return;
+        }
+        const ct = res.headers.get('content-type') || '';
+        let body = ct.includes('application/json') ? await res.json() : { error: await res.text() };
+        if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
         setPromotions(prev => prev.filter(p => p.id !== id));
-        setMessage('Delete Promotion Successful!');
-        setError(false);
-  
       } catch (e) {
         setError(true);
         setMessage(e.message || String(e));
@@ -207,20 +209,27 @@ export default function PromotionsPage() {
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
           {/* Type filter */}
           <div className={styles.filterItem}>
-            <label className={styles.filterLabel}>Type:</label>
-            <PrimaryActionDropDownButton
-              options={[
-                { text: 'Any', action: () => { setTypeFilter(''); setPage(1); setReachedEnd(false); } },
-                { text: 'Automatic', action: () => { setTypeFilter('automatic'); setPage(1); setReachedEnd(false); } },
-                { text: 'One-time', action: () => { setTypeFilter('one-time'); setPage(1); setReachedEnd(false); } },
-              ]}
-              className={styles.filterDropDown}
-            />
+            <label className={styles.filterLabel} style={{ marginRight: 8 }}>Type:</label>
+            {(() => {
+              const currentText = !typeFilter ? 'Any' : (typeFilter === 'automatic' ? 'Automatic' : 'One-time');
+              const opts = [
+                { text: currentText, action: () => { /* primary click keeps current */ } },
+                { text: 'Any', action: () => { setTypeFilter(''); setPage(1); setReachedEnd(false); setFiltersVersion(v => v + 1); } },
+                { text: 'Automatic', action: () => { setTypeFilter('automatic'); setPage(1); setReachedEnd(false); setFiltersVersion(v => v + 1); } },
+                { text: 'One-time', action: () => { setTypeFilter('one-time'); setPage(1); setReachedEnd(false); setFiltersVersion(v => v + 1); } },
+              ];
+              return (
+                <PrimaryActionDropDownButton
+                  options={opts}
+                  className={styles.filterDropDown}
+                />
+              );
+            })()}
           </div>
 
           {/* filter inputs (commit on Search click) */}
-          <label style={{ fontSize: 14 }}>
-            Start after:&nbsp;
+          <label style={{ fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span>Start after:</span>
             <input
               type="date"
               value={startAfter}
@@ -228,8 +237,8 @@ export default function PromotionsPage() {
               style={{ padding: '6px 8px', borderRadius: 6 }}
             />
           </label>
-          <label style={{ fontSize: 14 }}>
-            End before:&nbsp;
+          <label style={{ fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span>End before:</span>
             <input
               type="date"
               value={endBefore}
@@ -267,13 +276,14 @@ export default function PromotionsPage() {
               style={{ padding: '6px 8px', borderRadius: 6, width: 100 }}
             />
           </label>
-
-          <button type="button" onClick={triggerSearch} style={{ padding: '6px 10px', borderRadius: 6 }}>
-            Apply Filters
-          </button>
-          <button type="button" onClick={clearFilters} style={{ padding: '6px 10px', borderRadius: 6 }}>
-            Clear Filters
-          </button>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button type="button" onClick={triggerSearch} className={styles.searchBtn}>
+              Search & Apply
+            </button>
+            <button type="button" onClick={clearFilters} className={styles.searchBtn}>
+              Clear 
+            </button>
+          </div>
         </div>
 
         <div className={styles.resultsContainer}>

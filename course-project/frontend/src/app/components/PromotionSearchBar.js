@@ -12,14 +12,14 @@ export default function PromotionSearchBar({ searchName, setSearchName, onSearch
         onChange={(e) => setSearchName(e.target.value)}
         className={styles.searchInput}
       />
-      <button type="button" onClick={onSearch} className={styles.searchBtn}>Search</button>
+      {/* <button type="button" onClick={onSearch} className={styles.searchBtn}>Search</button>
       <button
         type="button"
         onClick={() => { setSearchName(''); onSearch(); }}
         className={styles.searchBtn}
       >
         Clear
-      </button>
+      </button> */}
     </div>
   );
 }

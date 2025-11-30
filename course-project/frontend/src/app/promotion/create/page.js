@@ -11,9 +11,9 @@ export default function CreatePromotion() {
     const [promotionName, setPromotionName] = useState("");
     const [description, setDescription] = useState("");
     const [type, setType] = useState("automatic");
-    const [minimumSpend, setMinimumSpend] = useState(0);
-    const [rate, setRate] = useState(0);
-    const [points, setPoints] = useState(0);
+    const [minimumSpend, setMinimumSpend] = useState('');
+    const [rate, setRate] = useState('');
+    const [points, setPoints] = useState('');
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
 
@@ -26,35 +26,59 @@ export default function CreatePromotion() {
     async function handleSend() {
         setMessage("");
         try {
-            const url = `${backend}/promotions`
-            const payload = {
-                "name": promotionName,
-                "description": description,
-                "type": type,
-                "startTime": startTime,
-                "endTime": endTime,
-                "minSpending": minimumSpend, 
-                "rate": rate, 
-                "points": points
+            if (!backend) throw new Error('Missing backend URL');
+            if (!promotionName || !type || !startTime || !endTime) {
+                throw new Error('Please fill Promotion Name, Type, Start Time, and End Time');
             }
+            const url = `${backend}/promotions`;
+            const normalizedType = type === 'one-time' ? 'onetime' : type;
+            const toISO = (dt) => {
+              // datetime-local => ISO
+              const d = new Date(dt);
+              if (isNaN(d)) throw new Error('Invalid date/time');
+              return d.toISOString();
+            };
+            const payload = {
+                name: promotionName,
+                description,
+                type: normalizedType,
+                startTime: toISO(startTime),
+                endTime: toISO(endTime),
+                minSpending: minimumSpend === '' ? 0 : Number(minimumSpend),
+                rate: rate === '' ? 0 : Number(rate),
+                points: points === '' ? 0 : Number(points)
+            };
             const createPromotion = await fetch(url, {
                 method: 'POST',
-                // headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
                 credentials: 'include',
                 body: JSON.stringify(payload)
             });
-            const response = await createPromotion.json(); // returns promise so need await
+            const contentType = createPromotion.headers.get('content-type') || '';
+            const response = contentType.includes('application/json')
+              ? await createPromotion.json()
+              : { error: await createPromotion.text() };
 
-
-            if( !createPromotion.ok) {
-                throw new Error(response.error)
+            if (!createPromotion.ok) {
+                throw new Error(response.error || `HTTP ${createPromotion.status}`);
             }
             setError(false);
-            setMessage("Create Promotion Successful!");
-
+            setMessage('Create Promotion Successful!');
+            // optional: clear form
+            setPromotionName('');
+            setDescription('');
+            setType('automatic');
+            setMinimumSpend('');
+            setRate('');
+            setPoints('');
+            setStartTime('');
+            setEndTime('');
         } catch (err) {
             setError(true);
-            setMessage(err.toString());
+            setMessage(err.message || String(err));
         }
     }
 
@@ -117,7 +141,8 @@ export default function CreatePromotion() {
                         <input
                             type="number"
                             value={rate}
-                            onChange={(e) => setRate(Number(e.target.value))}
+                            onChange={(e) => setRate(e.target.value)}
+                            inputMode="decimal"
                         />
                     </div>
 
@@ -127,7 +152,8 @@ export default function CreatePromotion() {
                         <input
                             type="number"
                             value={minimumSpend}
-                            onChange={(e) => setMinimumSpend(Number(e.target.value))}
+                            onChange={(e) => setMinimumSpend(e.target.value)}
+                            inputMode="decimal"
                         />
 
                         <h5>End Time</h5>
@@ -141,7 +167,8 @@ export default function CreatePromotion() {
                         <input
                             type="number"
                             value={points}
-                            onChange={(e) => setPoints(Number(e.target.value))}
+                            onChange={(e) => setPoints(e.target.value)}
+                            inputMode="numeric"
                         />
                     </div>
                 </div>
