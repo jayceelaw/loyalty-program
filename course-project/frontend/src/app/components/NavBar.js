@@ -50,13 +50,22 @@ export default function NavBar() {
   const isActive = (path) => {
     const curr_path = normalizePath(pathname || '');
     const target_path = normalizePath(path);
-
     // treat root "/" as dashboard same as "/user"
     if ((curr_path === '/' || curr_path === '') && target_path === '/user') return true;
     if (curr_path === target_path) return true;
-    if (target_path === '/event' || target_path === '/promotion' || target_path === '/transaction') {
-        return curr_path === target_path || curr_path.startsWith(target_path + '/');
+    // Events tab
+    if (target_path === '/event' || target_path === '/events') {
+      return curr_path === '/event' || curr_path === '/events' || curr_path.startsWith('/event/') || curr_path.startsWith('/events/');
     }
+    // Promotions tab
+    if (target_path === '/promotion' || target_path === '/promotions') {
+      return curr_path === '/promotion' || curr_path === '/promotions' || curr_path.startsWith('/promotion/') || curr_path.startsWith('/promotions/');
+    }
+    // Transaction tab
+    if (target_path === '/transaction') {
+      return curr_path === '/transaction' || curr_path.startsWith('/transaction/');
+    }
+    return false;
   };
 
   // Check if current page is in the main nav
@@ -126,11 +135,10 @@ export default function NavBar() {
               className={`${styles.navTab} ${ isActive(item.path) ? styles.active : '' }`}
             >
               {item.label}
-            </Link>
+            </Link> 
           ))}
-
-          <EventMenu className={`${styles.navTab} ${isActive('/event') ? styles.active : ''}`} />
           <PromotionMenu className={`${styles.navTab} ${isActive('/promotion') ? styles.active : ''}`} />
+          <EventMenu className={`${styles.navTab} ${isActive('/event') ? styles.active : ''}`} />
           <TransactionMenu className={`${styles.navTab} ${isActive('/transaction') ? styles.active : ''}`} />
 
           {/* Divider */}
