@@ -176,7 +176,7 @@ export default function EventDetailPage() {
                             {isManager && (
                                 <PrimaryButton
                                     text="Add or Remove Organizers"
-                                    onClick={() => router.push('/event/addEventOrganizer')}
+                                    onClick={() => router.push(`/event/addEventOrganizer?eventId=${id}`)}
                                 />
                             )}
                             <PrimaryButton
@@ -185,7 +185,7 @@ export default function EventDetailPage() {
                             />
                             <PrimaryButton
                                 text="Update Event"
-                                onClick={() => router.push('/event/update')}
+                                onClick={() => router.push(`/event/update?eventId=${id}`)}
                             />
                         </div>
                     </>
