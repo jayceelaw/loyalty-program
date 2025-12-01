@@ -57,7 +57,8 @@ router.post('/tokens', async (req, res) => {
 
     res.cookie("jwt_token", token, {
         httpOnly: true,
-        sameSite: "lax"
+        sameSite: "none",  // allow cross-origin to backend
+        secure: true       // for https
     });
 
     res.json({
