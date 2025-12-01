@@ -52,7 +52,10 @@ export default function PromotionsPage() {
     // build query params
     const params = new URLSearchParams();
     if (searchName) params.set('name', searchName);
-    if (typeFilter) params.set('type', typeFilter);
+    if (typeFilter) {
+      const backendType = typeFilter === 'one-time' ? 'onetime' : typeFilter;
+      params.set('type', backendType);
+    }
     if (startAfter) params.set('startAfter', startAfter);
     if (endBefore) params.set('endBefore', endBefore);
     if (rateMin) params.set('rateMin', rateMin);

@@ -300,12 +300,11 @@ router.patch('/:promotionId', jwtAuth, async (req, res) => {
         if (!description || typeof description !== 'string') return res.status(400).json({ error: "Description must exist and must be a string" });
         update.description = description;
     }
+    // ensure type matches prisma schema enum
+    // prisma schema should define type as enum: 'automatic' | 'onetime'
     if (type !== undefined && type !==null) {
         if (startedAlready) return res.status(400).json({ error: "Cannot edit, event already started" });
-        if (type !== 'automatic' && type !== 'one-time') return res.status(400).json({ error: "Type must be selected" });
-        if (type === 'one-time') {
-            type = 'onetime';
-        }
+        if (type !== 'automatic' && type !== 'onetime') return res.status(400).json({ error: "Type must be 'automatic' or 'onetime'" });
         update.type = type;
     }
     if (startTime !== undefined && startTime !==null) {
