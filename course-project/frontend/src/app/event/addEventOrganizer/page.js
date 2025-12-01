@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
 import Notification from '../../components/Notification';
@@ -9,6 +9,7 @@ import styles from '../event.module.css';
 
 export default function AddEventOrganizer() {
     const searchParams = useSearchParams()
+    const router = useRouter();
     const initialEventId = searchParams.get('eventId') || '';
     const [currentEventId, setCurrentEventId] = useState(initialEventId);
 
@@ -24,15 +25,13 @@ export default function AddEventOrganizer() {
     const showNotification = (message, type = 'success') => setNotification({ isVisible: true, message, type });
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
-    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
     // fetch Event + Organizers
     const fetchEventOrganizer = useCallback(async (eventId) => {
         if (!eventId) return;
         setLoading(true);
         setError('');
         try {
-            const res = await fetch(`${backendURL}/events/${eventId}`, {
+            const res = await fetch(`/events/${eventId}`, {
                 credentials: 'include'
             });
             if (!res.ok) {
@@ -67,7 +66,7 @@ export default function AddEventOrganizer() {
       if (!newOrganizerUtorid.trim()) return showNotification('UTORID required', 'error');
       setActionLoading(true);
       try {
-        const res = await fetch(`${backendURL}/events/${currentEventId}/organizers`, {
+        const res = await fetch(`/events/${currentEventId}/organizers`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,7 +95,7 @@ export default function AddEventOrganizer() {
         setActionLoading(true);
         try {
             const res = await fetch(
-                `${backendURL}/events/${currentEventId}/organizers/${selectedUserId}`,
+                `/events/${currentEventId}/organizers/${selectedUserId}`,
                 {
                     method: 'DELETE',
                     // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -141,14 +140,17 @@ export default function AddEventOrganizer() {
                         value={currentEventId}
                         onChange={(e) => {
                             setCurrentEventId(e.target.value.trim());
-                            setCurrentOrganizers([])
+                            setCurrentOrganizers([]);
                         }}
                         className={styles.input}
                         disabled={actionLoading}
                     />
                     <PrimaryButton
                         text="Load"
-                        onClick={() => currentEventId && fetchEventOrganizer(currentEventId)}
+                        onClick={() => {
+                            router.replace(`?eventId=${currentEventId}`);
+                            currentEventId && fetchEventOrganizer(currentEventId);
+                        }}
                         disabled={!currentEventId || actionLoading || loading}
                     />
 

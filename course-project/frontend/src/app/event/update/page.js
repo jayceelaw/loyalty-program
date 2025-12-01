@@ -26,17 +26,15 @@ export default function UpdateEvent() {
   const [loadingExisting, setLoadingExisting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
   const router = useRouter();
 
   async function loadEvent() {
     setMessage(''); setError(false);
-    if (!backend) { setError(true); setMessage('Backend URL not configured'); return; }
     const idNum = Number(eventId);
     if (!Number.isInteger(idNum)) { setError(true); setMessage('Enter a numeric ID'); return; }
     try {
       setLoadingExisting(true);
-      const res = await fetch(`${backend}/events/${idNum}`, {
+      const res = await fetch(`/events/${idNum}`, {
         // headers: { Authorization: `Bearer ${token}` }
         credentials: 'include'
       });
@@ -100,7 +98,7 @@ export default function UpdateEvent() {
       setSubmitting(true);
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (!token) throw new Error('Not logged in');
-      const res = await fetch(`${backend}/events/${idNum}`, {
+      const res = await fetch(`/events/${idNum}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -126,6 +124,17 @@ export default function UpdateEvent() {
     }
   }
 
+  // event id input - update state
+  const handleEventIdChange = (newId) => {
+    setEventId(newId);
+  };
+
+  // update url search param only when load is pressed
+  const handleLoadEvent = () => {
+    router.replace(`?eventId=${eventId}`);
+    loadEvent();
+  };
+
   return (
     <div className="main-container">
       <h1>Update Event</h1>
@@ -135,12 +144,12 @@ export default function UpdateEvent() {
             <input
               type="text"
               value={eventId}
-              onChange={e => setEventId(e.target.value)}
+              onChange={e => handleEventIdChange(e.target.value)}
               disabled={submitting || loadingExisting}
             />
             <PrimaryButton
               text={loadingExisting ? 'Loading...' : 'Load'}
-              onClick={loadEvent}
+              onClick={handleLoadEvent}
               disabled={submitting || loadingExisting || !eventId}
             />
         </div>

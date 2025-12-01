@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export default function PromotionsPage() {
   const PAGELIMIT = 3;
   const {user, token, initializing, currentInterface} = useAuth();
-  const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
   const scrollRef = useRef();
 
   // search params
@@ -64,7 +63,7 @@ export default function PromotionsPage() {
     params.set('limit', PAGELIMIT);
 
     try {
-      const res = await fetch(`${backendURL}/promotions?${params.toString()}`, {
+      const res = await fetch(`/promotions?${params.toString()}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include'
       });
@@ -166,10 +165,9 @@ export default function PromotionsPage() {
   // delete handler
   const handleDelete = async (id) => {
     if (!token) return;
-    if (!backendURL) { setError(true); setMessage('Missing backend URL'); return; }
     if (!window.confirm(`Delete promotion #${id}?`)) return;
     try {
-      const url = `${backendURL}/promotions/${id}`;
+      const url = `/promotions/${id}`;
       const res = await fetch(url, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },

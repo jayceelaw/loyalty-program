@@ -4,14 +4,19 @@ import { useState, useEffect } from "react";
 import styles from "../page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function UpdatePromotion() {
+
+  // search param
+  const searchParams = useSearchParams()
+  const initialPromotionId = searchParams.get('promotionId') || '';
+  const [promotionId, setPromotionId] = useState(initialPromotionId);
+
   // get token
   const { initializing, user } = useAuth();
 
   // Promotion id
-  const [promotionId, setPromotionId] = useState('');
   const [promotionName, setPromotionName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState(''); 
@@ -140,6 +145,17 @@ export default function UpdatePromotion() {
     }
   }
 
+  // Promotion ID input - update state
+  const handlePromotionIdChange = (newId) => {
+    setPromotionId(newId);
+  };
+
+  // Update URL search param only when Load is pressed
+  const handleLoadPromotion = () => {
+    router.replace(`?promotionId=${promotionId}`);
+    loadPromotion();
+  };
+
   return (
     <div className="main-container">
       <h1>Update Promotion</h1>
@@ -147,8 +163,8 @@ export default function UpdatePromotion() {
         {/* Promotion ID (required) */}
         <div className={styles.fullWidthInput}>
           <h5>Promotion ID</h5>
-          <input type="text" value={promotionId} onChange={(e) => setPromotionId(e.target.value)} disabled={loading} />
-          <PrimaryButton text={loading ? 'Loading...' : 'Load'} onClick={loadPromotion} disabled={loading || !promotionId} />
+          <input type="text" value={promotionId} onChange={(e) => handlePromotionIdChange(e.target.value)} disabled={loading} />
+          <PrimaryButton text={loading ? 'Loading...' : 'Load'} onClick={handleLoadPromotion} disabled={loading || !promotionId} />
         </div>
         {/* Show existing summary if loaded */}
         {original && (

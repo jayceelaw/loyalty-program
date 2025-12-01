@@ -22,7 +22,6 @@ export default function CreatePromotion() {
     const [message, setMessage] = useState("");
     const [error, setError] = useState(false);
 
-    const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
     const router = useRouter();
 
     // redirect unsigned user
@@ -35,11 +34,10 @@ export default function CreatePromotion() {
     async function handleSend() {
         setMessage("");
         try {
-            if (!backend) throw new Error('Missing backend URL');
             if (!promotionName || !type || !startTime || !endTime) {
                 throw new Error('Please fill Promotion Name, Type, Start Time, and End Time');
             }
-            const url = `${backend}/promotions`;
+            const url = `/promotions`;
             const normalizedType = type === 'one-time' ? 'onetime' : type;
             const toISO = (dt) => {
               // datetime local to ISO
