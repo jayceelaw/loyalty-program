@@ -4,7 +4,6 @@
 require('dotenv').config(); 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-
 const port = process.env.PORT || (() => {
     const args = process.argv;
 
@@ -68,7 +67,7 @@ app.all('*', (_, res) => {
   return res.status(405).json({ error: "Method Not Allowed" });
 });
 
-const http = require("http"); // TODO: change to https with certificate
+const http = require("http");
 
 const server = http.createServer(app);
 

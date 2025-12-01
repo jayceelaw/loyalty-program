@@ -3,6 +3,7 @@
 
 const express = require('express'); 
 const router = express.Router(); 
+const BACKEND_URL = process.env.BACKEND_URL;
 
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -57,8 +58,9 @@ router.post('/tokens', async (req, res) => {
 
     res.cookie("jwt_token", token, {
         httpOnly: true,
-        sameSite: "none",  // allow cross-origin to backend
-        secure: true       // for https
+        sameSite: "none", 
+        secure: true, 
+        domain: BACKEND_URL
     });
 
     res.json({
