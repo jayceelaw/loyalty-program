@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-require('./prisma/seed.js');
 require('dotenv').config(); 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
