@@ -8,10 +8,8 @@ import Notification from '../../components/Notification';
 import styles from '../event.module.css';
 
 export default function AddEventOrganizer() {
-    const router = useRouter();
     const { user } = useAuth();
     const [currentEventId, setCurrentEventId] = useState('');
-    const [event, setEvent] = useState(null);
     const [selectedUserId, setSelectedUserId] = useState('');
     const [newOrganizerUtorid, setNewOrganizerUtorid] = useState('');
     const [loading, setLoading] = useState(true);
@@ -23,8 +21,7 @@ export default function AddEventOrganizer() {
     const showNotification = (message, type = 'success') => setNotification({ isVisible: true, message, type });
     const closeNotification = () => setNotification(prev => ({ ...prev, isVisible: false }));
 
-    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
+    const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;c
 
     // fetch Event + Organizers
     const fetchEventOrganizer = useCallback(async (eventId) => {
@@ -38,13 +35,11 @@ export default function AddEventOrganizer() {
             if (!res.ok) {
                 let body = {};
                 try { body = await res.json(); } catch {}
-                setEvent(null);
                 throw new Error(body.error || `Failed (HTTP ${res.status})`);
             }
             const data = await res.json();
             console.log('[AddEventOrganizer] fetched event:', data);
             setCurrentOrganizers(Array.isArray(data.organizers) ? data.organizers : []);  
-            setEvent(data);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -143,7 +138,6 @@ export default function AddEventOrganizer() {
                         value={currentEventId}
                         onChange={(e) => {
                             setCurrentEventId(e.target.value.trim());
-                            setEvent(null);
                             setCurrentOrganizers([])
                         }}
                         className={styles.input}

@@ -133,7 +133,7 @@ router.get('/', jwtAuth, async (req, res) => {
 
     // name filter 
     if (filters.name) {
-        where.name = { contains: String(filters.name), mode: 'insensitive' };
+        where.name = { contains: String(filters.name) };
     }
 
     // type filter
