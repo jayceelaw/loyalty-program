@@ -19,6 +19,7 @@ export default function SendMessage() {
             return;
         }
         await notify(utorid, message);
+        setMessage("");
     };
 
     return (
