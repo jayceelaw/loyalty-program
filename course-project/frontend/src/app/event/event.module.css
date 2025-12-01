@@ -373,18 +373,18 @@
 
 @media (max-width: 480px) {
   .container {
+    width: 94%;
     padding: 8px;
     min-height: calc(100vh - 80px);
   }
   .subContainer {
-    padding: 10px;
-    margin-top: 16px;
     width: 98vw;
-    height: auto;
-    border-radius: 18px;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 10px;
   }
   .form, .createForm {
-    width: 98vw;
+    width: 100%;
     min-width: 0;
     height: auto;
     padding-bottom: 0;
@@ -392,12 +392,12 @@
   }
   .columns {
     grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 8px;
-    border-radius: 6px;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 8px;
   }
   .column {
-    gap: 10px;
+    gap: 12px;
   }
   .fullWidthInput {
     gap: 6px;

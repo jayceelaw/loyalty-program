@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 
 export default function CreatePromotion() {
     const { token, initializing, user } = useAuth();
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
     
     const [promotionName, setPromotionName] = useState("");
     const [description, setDescription] = useState("");
@@ -37,7 +39,7 @@ export default function CreatePromotion() {
             if (!promotionName || !type || !startTime || !endTime) {
                 throw new Error('Please fill Promotion Name, Type, Start Time, and End Time');
             }
-            const url = `/promotions`;
+            const url = `${BACKEND_URL}/promotions`;
             const normalizedType = type === 'one-time' ? 'onetime' : type;
             const toISO = (dt) => {
               // datetime local to ISO

@@ -7,6 +7,7 @@ import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function UpdatePromotion() {
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
   // search param
   const searchParams = useSearchParams()
@@ -64,7 +65,7 @@ export default function UpdatePromotion() {
     try {
 
       // get promotion information to adjust
-      const url = `/promotions/${idNum}`;
+      const url = `${BACKEND_URL}/promotions/${idNum}`;
       const res = await fetch(url, { credentials: 'include' } );
       const body = await res.json();
 
@@ -116,7 +117,7 @@ export default function UpdatePromotion() {
     const relevantOptions = Object.fromEntries(Object.entries(options).filter(([k, v]) => v !== '' && v !== undefined));
     try {
       setLoading(true);
-      const url = `/promotions/${idNum}`;
+      const url = `${BACKEND_URL}/promotions/${idNum}`;
       const res = await fetch(url, {
         method: 'PATCH',
         headers: {

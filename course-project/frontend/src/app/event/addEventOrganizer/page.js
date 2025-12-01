@@ -6,6 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
 import Notification from '../../components/Notification';
 import styles from '../event.module.css';
+import FeedBackMessage from "@/app/components/FeedbackMessage";
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function AddEventOrganizer() {
@@ -96,12 +98,8 @@ export default function AddEventOrganizer() {
         setActionLoading(true);
         try {
             const res = await fetch(
-                `/events/${currentEventId}/organizers/${selectedUserId}`,
-                {
-                    method: 'DELETE',
-                    // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-                    credentials: 'include'
-                }
+              `${BACKEND_URL}/events/${currentEventId}/organizers/${selectedUserId}`,
+              { method: 'DELETE', credentials: 'include' }
             );
             if (res.ok) {
                 showNotification('Organizer removed!');
@@ -229,7 +227,7 @@ export default function AddEventOrganizer() {
                     onClose={closeNotification}
                     type={notification.type}
                 />
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                <FeedBackMessage error={!!error} message={error}/>
             </div>
         </main>
     );

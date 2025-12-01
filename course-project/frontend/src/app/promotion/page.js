@@ -168,7 +168,7 @@ export default function PromotionsPage() {
     if (!token) return;
     if (!window.confirm(`Delete promotion #${id}?`)) return;
     try {
-      const url = `/promotions/${id}`;
+      const url = `${BACKEND_URL}/promotions/${id}`;
       const res = await fetch(url, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
