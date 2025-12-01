@@ -54,6 +54,11 @@ export function NotificationProvider({children}) {
                     return;
                 }
 
+                if (notification.unseen) {
+                    setUnseen(notification.count);
+                    return;
+                }
+
                  // feedback message from sending messages
                 setResult({});
                 if (notification.error) {
@@ -65,8 +70,8 @@ export function NotificationProvider({children}) {
                     return;
                 }
 
-                // unseen count
-                if (!notification.seen) setUnseen(prev => prev + 1);
+                // new and unseen count
+                if (!notification.seen && !notification.old) setUnseen(prev => prev + 1);
 
                 // determine where to load notification (recent or old)
                 if (notification.old) {

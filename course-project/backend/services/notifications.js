@@ -62,4 +62,22 @@ const viewNotification = async (id) => {
 
 }
 
-module.exports = { storeNotification, clearNotifications, retrieveNotifications, viewNotification };
+const countUnseen = async (utorid) => {
+    try {
+        const result = await prisma.notification.count({ 
+            where: { utorid: utorid, seen: false }
+        });
+        return result;
+        
+    }
+    catch (err) {
+        console.log(err.message);
+    }
+
+}
+
+module.exports = { storeNotification,
+                   clearNotifications,
+                   retrieveNotifications,
+                   viewNotification,
+                   countUnseen };

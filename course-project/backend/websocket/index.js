@@ -12,7 +12,8 @@ const clients = new Map();
 let wss; // websocket instance
 
 const { storeNotification, clearNotifications, 
-      retrieveNotifications, viewNotification } = require('../services/notifications'); 
+      retrieveNotifications, viewNotification, 
+      countUnseen} = require('../services/notifications'); 
 
 require('dotenv').config(); 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
@@ -89,6 +90,10 @@ function initWebSocket(server) {
       clients.set(utorid, ws);
       console.log(`${utorid} connected via WebSocket`);
     }
+
+    // send number of unseen notifications
+    const count = await countUnseen(ws.user.utorid);
+    ws.send(JSON.stringify({ unseen: true, count: count}));
  
     // user sends request
     ws.on("message", async (data) => {
