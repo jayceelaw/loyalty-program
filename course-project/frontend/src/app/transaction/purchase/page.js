@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 export default function Purchase() {
 
     const router = useRouter();
@@ -46,7 +47,7 @@ export default function Purchase() {
             return v !== '';
         }));       
 
-        fetch(`/transactions`, {
+        fetch(`${BACKEND_URL}/transactions`, {
             headers: { 'Content-Type': 'application/json'},
             method: "POST",
             credentials: 'include',

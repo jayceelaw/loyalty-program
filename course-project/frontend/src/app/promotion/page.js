@@ -6,6 +6,7 @@ import PrimaryActionDropDownButton from '../components/PrimaryActionDropDownButt
 import { useAuth } from '../../context/AuthContext'; 
 import PromotionCard from '../components/PromotionCard'
 import { useRouter, useSearchParams } from 'next/navigation';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function PromotionsPage() {
   const PAGELIMIT = 3;
@@ -63,7 +64,7 @@ export default function PromotionsPage() {
     params.set('limit', PAGELIMIT);
 
     try {
-      const res = await fetch(`/promotions?${params.toString()}`, {
+      const res = await fetch(`${BACKEND_URL}/promotions?${params.toString()}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include'
       });

@@ -19,12 +19,13 @@ export default function EditProfileForm() {
   const [success, setSuccess] = useState('');
 
   const [initialData, setInitialData] = useState(null);
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
   useEffect(() => {
     let mounted = true;
     async function fetchMe() {
       try {
-        const res = await fetch('/users/me', {
+        const res = await fetch(`${BACKEND_URL}/users/me`, {
         //   headers: {
         //     'Content-Type': 'application/json',
         //     ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -80,7 +81,7 @@ export default function EditProfileForm() {
         fd.append('name', name.trim());
         fd.append('email', email.trim());
         if (birthday) fd.append('birthday', birthday);
-        res = await fetch('/users/me', {
+        res = await fetch(`${BACKEND_URL}/users/me`, {
           method: 'PATCH',
         //   headers: {
         //     ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -90,7 +91,7 @@ export default function EditProfileForm() {
         });
       } else {
         // send JSON
-        res = await fetch('/users/me', {
+        res = await fetch(`${BACKEND_URL}/users/me`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ export default function EditProfileForm() {
       <div className={styles.avatarRow}>
         <div className={styles.avatarPreview}>
           {avatarUrl ? (
-            <img src={avatarUrl} alt="avatar" className={styles.avatarImage} />
+            <img src={`${BACKEND_URL}/${avatarUrl}`} alt="avatar" className={styles.avatarImage} />
           ) : (
             <div className={styles.avatarPlaceholder}>No avatar</div>
           )}

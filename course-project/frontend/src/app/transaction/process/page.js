@@ -4,6 +4,7 @@ import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function Process() {
 
@@ -35,7 +36,7 @@ export default function Process() {
             return;
         }
 
-        fetch(`/transactions/${transactionID}/processed`, {
+        fetch(`${BACKEND_URL}/transactions/${transactionID}/processed`, {
             headers: { 'Content-Type': 'application/json'},
             method: "PATCH",
             credentials: 'include',

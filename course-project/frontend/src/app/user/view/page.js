@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import styles from '../user.module.css';
 import Button from '../../components/Button';
 import PrimaryActionDropDownButton from '../../components/PrimaryActionDropDownButton';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function UserViewPage() {
     const router = useRouter();
@@ -24,7 +25,6 @@ export default function UserViewPage() {
     let filter = false;
     const limit = 5;
     const roles = ['regular', 'cashier', 'manager', 'superuser'];
-    const BACKEND_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 
     useEffect(() => {
@@ -66,7 +66,7 @@ export default function UserViewPage() {
         params += (params ? '&' : '') + "page=" + p;
         params += "&limit=" + limit;
 
-        const res = await fetch(`/users?${params}`, {
+        const res = await fetch(`${BACKEND_URL}/users?${params}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export default function UserViewPage() {
         }
 
         try {
-            const res = await fetch(`/users/${userId}`, {
+            const res = await fetch(`${BACKEND_URL}/users/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -300,16 +300,16 @@ export default function UserViewPage() {
                 <div className={styles.resultsCard}>
                     <div className={styles.userList} onScroll={handleScroll}>
                         {users.map(u => {
-                            let avatarSrc = '/Friend Symbol.svg';
+                            let avatarSrc = `${BACKEND_URL}/${u?.avatarUrl}`;// '/Friend Symbol.svg';
                             if (u?.avatarUrl) {
                                 if (/^https?:\/\//i.test(u.avatarUrl)) {
                                     avatarSrc = u.avatarUrl;
                                 } else if (u.avatarUrl.startsWith('/')) {
                                     // if backend base is provided, prefix it; otherwise assume same origin
-                                    avatarSrc = BACKEND_BASE ? `${BACKEND_BASE}${u.avatarUrl}` : u.avatarUrl;
+                                    avatarSrc = `${BACKEND_URL}/${u?.avatarUrl}`;
                                 } else {
                                     // a bare filename or relative path
-                                    avatarSrc = BACKEND_BASE ? `${BACKEND_BASE}/${u.avatarUrl}` : `/${u.avatarUrl}`;
+                                    avatarSrc = `${BACKEND_URL}/${u?.avatarUrl}`;
                                 }
                             }
 

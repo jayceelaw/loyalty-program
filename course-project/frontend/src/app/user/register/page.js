@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Button from '../../components/Button.js';
 import styles from '../user.module.css';
 import colors from '../../constants/colors.js';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -42,7 +43,7 @@ export default function RegisterPage() {
 
 		setLoading(true);
 		try {
-			const res = await fetch('/users', {
+			const res = await fetch(`${BACKEND_URL}/users`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

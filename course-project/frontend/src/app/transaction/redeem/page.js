@@ -5,6 +5,7 @@ import PointsBalance from "@/app/components/PointsBalance";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
 import { PrimaryButton } from "@/app/components/Button";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 export default function Redeem() {
 
     const router = useRouter();
@@ -28,7 +29,7 @@ export default function Redeem() {
         setError(false);
         setMessage("");
 
-        fetch(`/users/me/transactions`, {
+        fetch(`${BACKEND_URL}/users/me/transactions`, {
             headers: { 'Content-Type': 'application/json'},
             method: "POST",
             credentials: 'include',
