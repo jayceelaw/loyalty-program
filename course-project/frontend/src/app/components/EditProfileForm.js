@@ -26,10 +26,10 @@ export default function EditProfileForm() {
     async function fetchMe() {
       try {
         const res = await fetch(`${BACKEND_URL}/users/me`, {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     ...(token ? { Authorization: `Bearer ${token}` } : {})
-        //   },
+          headers: {
+            'Content-Type': 'application/json',
+            // ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
           credentials: 'include'
         });
         if (!res.ok) return;
@@ -96,8 +96,8 @@ export default function EditProfileForm() {
           headers: {
             'Content-Type': 'application/json',
             // ...(token ? { Authorization: `Bearer ${token}` } : {})
-            credentials: 'include',
           },
+          credentials: 'include',
           body: JSON.stringify({
             name: name.trim(),
             email: email.trim(),

@@ -9,13 +9,6 @@ require('dotenv').config();
 const JWT_SECRET = process.env.JWT_SECRET; 
 
 const jwtAuth = (req, res, next) => {
-    // const authHeader = req.headers['authorization'];
-    // if (!authHeader) {
-    //     return res.status(401).json({ error: "missing token" });
-    // }
-
-    // parse auth header for token
-    // const token = authHeader.split(' ')[1]; // Authorization: Bearer <token>
     const token = req.cookies.jwt_token; // get from cookies
     if (!token) {
         return res.status(401).json({ error: "invalid token" });
