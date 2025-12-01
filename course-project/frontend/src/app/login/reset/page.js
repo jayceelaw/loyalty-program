@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import styles from '../login.module.css';
 import Button from '../../components/Button';
 import colors from '../../constants/colors';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function ResetPasswordPage() {
     }
 
 	// purposefully fail once to validate token first
-	const res = await fetch(`/auth/resets/${encodeURIComponent(token)}`, {
+	const res = await fetch(`${BACKEND_URL}/auth/resets/${encodeURIComponent(token)}`, {
     	method: 'POST',
         headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({utorid: sessionStorage.getItem('utorid'), password: ''}) // will fail on password (400)
@@ -55,7 +56,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`/auth/resets/${encodeURIComponent(token.trim())}`, {
+      const res = await fetch(`${BACKEND_URL}/auth/resets/${encodeURIComponent(token.trim())}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ utorid: sessionStorage.getItem('utorid'), password: password })

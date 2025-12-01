@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../components/Button';
 import styles from '../settings/settings.module.css';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function ChangePasswordForm() {
   const { token } = useAuth();
@@ -19,7 +20,7 @@ export default function ChangePasswordForm() {
     let mounted = true;
     async function checkPassword() {
       try {
-        const res = await fetch('/users/me', {
+        const res = await fetch(`${BACKEND_URL}/users/me`, {
           headers: {
             'Content-Type': 'application/json',
             // ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -50,7 +51,7 @@ export default function ChangePasswordForm() {
     
     setLoading(true);
     try {
-      const res = await fetch('/users/me/password', {
+      const res = await fetch(`${BACKEND_URL}/users/me/password`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

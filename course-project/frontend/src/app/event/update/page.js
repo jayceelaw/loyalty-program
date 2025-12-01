@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { PrimaryButton } from '@/app/components/Button';
 import styles from '../event.module.css';
 import { useSearchParams } from 'next/navigation';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 /* Manager only page to update events */
 
@@ -34,7 +35,7 @@ export default function UpdateEvent() {
     if (!Number.isInteger(idNum)) { setError(true); setMessage('Enter a numeric ID'); return; }
     try {
       setLoadingExisting(true);
-      const res = await fetch(`/events/${idNum}`, {
+      const res = await fetch(`${BACKEND_URL}/events/${idNum}`, {
         // headers: { Authorization: `Bearer ${token}` }
         credentials: 'include'
       });
@@ -98,7 +99,7 @@ export default function UpdateEvent() {
       setSubmitting(true);
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (!token) throw new Error('Not logged in');
-      const res = await fetch(`/events/${idNum}`, {
+      const res = await fetch(`${BACKEND_URL}/events/${idNum}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

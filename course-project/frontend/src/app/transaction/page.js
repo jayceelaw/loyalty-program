@@ -17,7 +17,7 @@ export default function TransactionsListPage() {
   const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
   const [ transactions, setTransactions ] = useState([]);
-  const [ showAll, setShowAll ] = useState(false);
+  const [ showAll, setShowAll ] = useState(null);
   const [ page, setPage ] = useState(1);
   const [ end, setEnd ] = useState(false);
   const [ loading, setLoading ] = useState(true);

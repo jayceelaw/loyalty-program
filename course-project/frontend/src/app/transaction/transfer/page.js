@@ -5,6 +5,8 @@ import PointsBalance from "@/app/components/PointsBalance";
 import { useAuth } from "@/context/AuthContext";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useRouter, useSearchParams } from "next/navigation";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+
 export default function Transfer() {
 
     const router = useRouter();
@@ -37,7 +39,7 @@ export default function Transfer() {
             return;
         }
 
-        fetch(`/users/${recipientID}/transactions`, {
+        fetch(`${BACKEND_URL}/users/${recipientID}/transactions`, {
             headers: { 'Content-Type': 'application/json'},
             credentials: 'include',
             method: "POST",

@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import Button from '../components/Button';
 import styles from './login.module.css';
 import colors from '../constants/colors';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function LoginPage() {
   const [utorid, setUtorid] = useState('');
@@ -35,7 +36,7 @@ export default function LoginPage() {
       return;
     }
 
-    const res = await fetch('/auth/resets', {
+    const res = await fetch(`${BACKEND_URL}/auth/resets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ utorid: utorid.trim() })

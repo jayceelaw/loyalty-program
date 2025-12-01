@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { PrimaryButton } from '../../components/Button';
 import Notification from '../../components/Notification';
 import styles from '../event.module.css';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function AddEventOrganizer() {
     const searchParams = useSearchParams()
@@ -31,7 +32,7 @@ export default function AddEventOrganizer() {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch(`/events/${eventId}`, {
+            const res = await fetch(`${BACKEND_URL}/events/${eventId}`, {
                 credentials: 'include'
             });
             if (!res.ok) {
@@ -66,7 +67,7 @@ export default function AddEventOrganizer() {
       if (!newOrganizerUtorid.trim()) return showNotification('UTORID required', 'error');
       setActionLoading(true);
       try {
-        const res = await fetch(`/events/${currentEventId}/organizers`, {
+        const res = await fetch(`${BACKEND_URL}/events/${currentEventId}/organizers`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

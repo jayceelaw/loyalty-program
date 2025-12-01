@@ -5,6 +5,7 @@ import TransactionCard from "@/app/components/TransactionCard";
 import { useRouter, useSearchParams } from "next/navigation";
 import FeedBackMessage from "@/app/components/FeedbackMessage";
 import { useAuth } from "@/context/AuthContext";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
 export default function Adjust() {
 
@@ -30,7 +31,7 @@ export default function Adjust() {
      // // retrieve transaction info
     useEffect(() =>{
         if (!user) return;
-         fetch(`/transactions/${transactionId}`, {
+         fetch(`${BACKEND_URL}/transactions/${transactionId}`, {
             headers: { 'Content-Type': 'application/json'},
             credentials: 'include'
         })
@@ -80,7 +81,7 @@ export default function Adjust() {
             return v !== '';
         }));       
 
-        fetch(`/transactions`, {
+        fetch(`${BACKEND_URL}/transactions`, {
             headers: { 'Content-Type': 'application/json'},
             method: "POST",
             credentials: 'include',
