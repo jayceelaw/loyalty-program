@@ -1,0 +1,15 @@
+AI was used to generate starter code for general components and css styles which were modified accordingly to suit our project.
+These components include:
+Some basic styles from course-project/frontend/globals.css,
+course-project/frontend/public/,
+course-project/frontend/src/app/components:
+  - Button
+  - Divider
+  - DropDownButton
+  - MenuModal
+  - Notification
+  - PrimaryActionDropDown
+  - Symbol
+  - TagSelect
+  - TextBox
+  - TextField
