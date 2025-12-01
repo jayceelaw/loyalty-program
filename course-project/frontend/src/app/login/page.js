@@ -55,7 +55,7 @@ export default function LoginPage() {
       <div className={styles.card}>
         <h1 className={styles.title}>Sign in</h1>
 
-        <form className={styles.form} onSubmit={submit} noValidate>
+        <form className={styles.form} noValidate>
           <label className={styles.label}>
             UTORid
             <input

@@ -73,9 +73,9 @@ export function AuthProvider({ children }) {
     .then(userData => {
       setUser(userData);
       setCurrentInterface(userData.role);
-    });
-
-    router.push("/user"); // TODO: change to home page
+    })
+    .then(() => router.push("/user"));
+    
   };
 
   const loadUser = () => {
