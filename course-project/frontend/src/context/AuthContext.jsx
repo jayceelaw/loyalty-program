@@ -49,7 +49,8 @@ export function AuthProvider({ children }) {
     const res = await fetch(`${BACKEND_URL}/auth/tokens`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ utorid, password })
+      body: JSON.stringify({ utorid, password }),
+      credentials: 'include'
     })
 
     const data = await res.json();
