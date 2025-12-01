@@ -3,4 +3,23 @@
 # You should write detailed description on:
 
 # 1. All the packages you need to install
+Make sure you have Node.js and npm installed.
+To verfify, run:
+node -v
+npm -v
+
+Once you have node and npm, install dependencies as follows below.
+/course-project/frontend/:
+npm install
+/course-project/backend/:
+npm install
+
 # 2. How to configure various servers (e.g., Nginx, Apache, etc)
+/course-project/frontend/: 
+npm run build
+npm run start
+
+backend/:
+npx prisma migrate deploy
+npx prisma db seed
+npm run start
