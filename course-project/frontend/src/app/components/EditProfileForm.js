@@ -136,6 +136,15 @@ export default function EditProfileForm() {
     avatarFile !== null
   );
 
+    let avatarSrc = null;
+    if (avatarUrl) {
+        if (/^https?:\/\//i.test(avatarUrl)) {
+            avatarSrc = avatarUrl;
+        } else {
+            avatarSrc = `${BACKEND_URL}/${avatarUrl}`;
+        }
+    }
+
   return (
     <form className={styles.formRight} onSubmit={handleSubmit} noValidate>
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -145,8 +154,8 @@ export default function EditProfileForm() {
 
       <div className={styles.avatarRow}>
         <div className={styles.avatarPreview}>
-          {avatarUrl ? (
-            <img src={`${BACKEND_URL}/${avatarUrl}`} alt="avatar" className={styles.avatarImage} />
+          {avatarSrc ? (
+            <img src={avatarSrc} alt="avatar" className={styles.avatarImage} />
           ) : (
             <div className={styles.avatarPlaceholder}>No avatar</div>
           )}
