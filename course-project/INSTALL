@@ -2,6 +2,9 @@
 
 # You should write detailed description on:
 
+# Use Git to clone the repository to your local machine:. 
+git clone https://github.com/kcltlee/CSC309-project.git
+
 # 1. All the packages you need to install
 # Make sure you have Node.js and npm installed.
 # To verfify, run:
@@ -35,3 +38,30 @@ npm run start
 npx prisma migrate deploy
 npx prisma db seed
 npm run start
+
+# 3. Deploying the website on Railway 
+# Log in to Railway and create new project. Select "Deploy from Github" and choose the repository. 
+# Add the corresponding enviornment variables. 
+
+# Frontend service variables: 
+NEXT_PUBLIC_BACKEND_URL
+
+# Backend service variables: 
+FRONTEND_URL
+DATABASE_URL
+JWT_SECRET
+PORT
+SENDGRID_API_KEY 
+
+# Frontend configuration commands: 
+Root directory: course-project/frontend
+Build command: npm run build
+Start command: npm run start
+
+# Backend configuration commands: 
+Root directory: course-project/backend
+Install command: npm install
+Before start command:
+npx prisma migrate deploy
+npx prisma db seed
+Start command: npm run start
